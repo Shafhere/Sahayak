@@ -1,72 +1,21 @@
-\# VOLT
+# Sahayak
 
+**Multilingual Agentic System for Government Scheme Discovery**
 
+A 5-agent system that takes a citizen's profile in their own language, researches all applicable government schemes, validates eligibility, and produces a cited action plan.
 
-\*\*Agentic Journey Intelligence System\*\*
+## The Story
+My grandmother missed a pension she qualified for because the information was English-only and buried. Millions of Indians face the same problem. Sahayak solves it.
 
+## Architecture
+- **5 Agents:** Understanding · Research · Planning · Critic · Replanner
+- **Orchestration:** LangGraph
+- **RAG:** ChromaDB + hybrid retrieval + reranking
+- **Live Data:** myScheme API + MCP server
+- **ML:** XGBoost eligibility predictor + BERT document classifier
+- **Backend:** FastAPI + PostgreSQL
+- **UI:** Streamlit
+- **Observability:** LangSmith
 
-
-A stateful multi-agent system that turns natural-language travel goals into grounded, feasible, and adaptable journey plans.
-
-
-
-\## Canonical Demo
-
-10-day motorcycle trip from Delhi through Kashmir — mountains, adventure, budget-friendly, moderate pace.
-
-
-
-\## Architecture
-
-\- \*\*5 Agents:\*\* Understanding · Research · Planning · Critic · Replanner
-
-\- \*\*Orchestration:\*\* LangGraph
-
-\- \*\*RAG:\*\* ChromaDB + hybrid retrieval + reranking
-
-\- \*\*ML:\*\* XGBoost cost estimator
-
-\- \*\*Backend:\*\* FastAPI + PostgreSQL
-
-\- \*\*UI:\*\* Streamlit + Folium map
-
-\- \*\*Observability:\*\* LangSmith
-
-
-
-\## Status
-
+## Status
 🚧 Week 1 — Planning
-
-
-
-\## Project Structure
-
-VOLT/
-
-├── app/ # application code
-
-├── data/ # knowledge base
-
-├── docs/ # diagrams
-
-├── notebooks/ # experiments
-
-├── tests/ # tests
-
-├── steps.md # development log
-
-└── README.md
-
-
-
-\## Development Log
-
-See \[steps.md](steps.md) for day-by-day progress.
-
-
-
-\## License
-
-MIT
-
