@@ -33,3 +33,26 @@ git branch -M main
 git remote add origin https://github.com/Shafhere/VOLT.git
 
 git push -u origin main
+
+## Day 2 — Project Rebrand & Topic Lock
+
+**Date:** [02/10]
+
+**Decision:** Changed project from VOLT (travel) to Sahayak (government scheme finder).
+
+**Reason:** Stronger story (personal — grandmother's missed pension), stronger social impact, native multilingual, native document verification, deeper ML, more unique.
+
+**Actions:**
+- Renamed GitHub repo to `Sahayak`
+- Updated local folder name
+- Updated remote URL
+- Updated README and .env.example
+
+**Git commands:**
+```cmd
+git remote set-url origin https://github.com/Shafhere/Sahayak.git
+git add .
+git commit -m "chore: rebrand to Sahayak — government scheme finder"
+git push
+
+
