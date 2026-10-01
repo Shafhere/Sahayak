@@ -61,3 +61,25 @@ git push
 - docs/arch_workflow.jpeg
 - docs/arch_state.jpeg
 
+
+## Day 3 — Technology Selection & Requirements
+
+
+**Goal:** Document tech choices and system requirements.
+
+**Files added:**
+- docs/06_technology_selection.md
+- docs/07_requirements.md
+
+**Key decisions:**
+- 5-agent architecture locked
+- ChromaDB + BM25 + RRF + rerank for RAG
+- XGBoost for eligibility (CNN/BiLSTM to Future Roadmap)
+- myScheme API + MCP for live data
+- Free-tier deployment only
+
+**End of day status:**
+- [x] Tech selection documented
+- [x] Requirements documented
+
+---
