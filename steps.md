@@ -56,3 +56,8 @@ git commit -m "chore: rebrand to Sahayak — government scheme finder"
 git push
 
 
+**Files added:**
+- docs/arch_system.jpeg
+- docs/arch_workflow.jpeg
+- docs/arch_state.jpeg
+
