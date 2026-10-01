@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# Environment
+.env
+.env.local
+
+# Data
+data/raw/*
+data/processed/*
+
+# Chroma
+chroma_db/
+.chroma/
+
+# Models
+*.pkl
+*.joblib
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Jupyter
+.ipynb_checkpoints/
