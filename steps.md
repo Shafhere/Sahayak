@@ -83,3 +83,33 @@ git push
 - [x] Requirements documented
 
 ---
+
+
+## Day 4 — State Design, Schemas, ER Diagram
+
+**Date:** [fill in]
+
+**Goal:** Define data contracts, state flow, and database schema.
+
+**Files added:**
+- app/schemas/citizen.py       (CitizenProfile)
+- app/schemas/scheme.py        (Scheme, Eligibility)
+- app/schemas/plan.py          (ActionPlan, CriticVerdict)
+- app/workflows/state.py       (SahayakState)
+
+**Drawn in notebook:**
+- SahayakState — the baton (8 compartments)
+- ER diagram (6 tables)
+- Agent flow (6 nodes, 1 loop)
+
+**Key decisions:**
+- State is a TypedDict — LangGraph standard
+- Schemas are Pydantic v2 — structured output validation
+- 6 tables: citizens, sessions, agent_runs, retrieval_logs, schemes, action_plans
+- Max 3 replan iterations
+
+**End of day status:**
+- [x] Pydantic schemas defined
+- [x] LangGraph state defined
+- [x] ER diagram drawn
+- [x] State flow diagram drawn
