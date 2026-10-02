@@ -187,3 +187,43 @@ Every document tagged with state, category, income limit, age range, gender, sou
 - [x] Ingestion pipeline designed
 - [x] Metadata schema defined
 - [x] Pushed to GitHub
+
+
+---
+
+## Day 7 — Looking Ahead (Oct 3)
+
+**Once upon a time**, we finished building the foundation. Today, we mapped the journey ahead.
+
+**Two documents written:**
+
+### Roadmap (`docs/roadmap.md`)
+- Week 1: Planning (complete)
+- Week 2: Core intelligence — Understanding + Research + RAG
+- Week 3: Agentic engine — Planning + Critic + Replanner + ML + UI
+- Week 4: Production — deploy, evaluate, document
+- Buffer week optional
+
+**Cut order defined:** multilingual → report → ML → charts. Never cut agents, RAG, Critic, Replanner.
+
+### Risk Assessment (`docs/risk_assessment.md`)
+- 5 categories: technical, data, timeline, quality, scope
+- Top 3 risks to watch daily:
+  1. LLM hallucination → mitigated by RAG + Critic + prompt rules
+  2. Timeline overrun in Week 3 → mitigated by cut order
+  3. Scope creep → every new idea goes to Future Roadmap
+
+**Contingency plans written:**
+- LLM cost fallback: Groq
+- Deployment fallback: Railway / Fly.io
+- If behind: cut non-core, add buffer week
+
+**End of Week 1 status:**
+- [x] All planning documents complete
+- [x] Architecture designed and drawn
+- [x] Prompts written
+- [x] Data collected (35 documents)
+- [x] Roadmap defined
+- [x] Risk assessment complete
+
+**Week 1 is done. Week 2 starts tomorrow.**
