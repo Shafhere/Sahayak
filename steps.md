@@ -147,3 +147,43 @@ git push
 - [x] All 5 prompts written
 - [x] Folder structure for prompts created
 - [x] Prompts pushed to GitHub
+
+---
+
+## Day 6 — Building the Library (Oct 3)
+
+**Once upon a time**, Sahayak knew what to do but didn't know where to look. Today, we built the library.
+
+**Three libraries:**
+1. Local knowledge base — 50 curated documents
+2. myScheme API — live scheme search
+3. MoSPI MCP — official statistics
+
+**The 50 documents:**
+- 15 central schemes
+- 15 Kerala state schemes
+- 10 general guides
+- 10 reference docs
+
+**The pipeline:**
+Raw PDF → Extract → Clean → Tag → Chunk → Embed → Store
+
+**Metadata schema:**
+Every document tagged with state, category, income limit, age range, gender, source URL, reliability, last checked date.
+
+**Key decisions:**
+- 500-token chunks with 50-token overlap
+- Metadata filtering before vector search
+- Hybrid retrieval (dense + BM25 + RRF)
+- Cross-encoder reranking
+- Freshness handled by live API calls
+
+**Files added:**
+- docs/data_sources.md
+
+**End of day status:**
+- [x] Data source plan documented
+- [x] 50-document target set
+- [x] Ingestion pipeline designed
+- [x] Metadata schema defined
+- [x] Pushed to GitHub
