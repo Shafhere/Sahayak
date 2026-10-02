@@ -1,115 +1,118 @@
-# Sahayak — Development Log
+# Sahayak — The Story of How It Was Built
 
-Day-by-day record of what was done.
+A day-by-day record. Not just what was done, but why.
 
 ---
 
-## Day 0 — Fresh Setup
+## Day 0 — The Beginning (Oct 1)
 
+**Once upon a time**, there was an idea called VOLT — a travel planner for a Kashmir motorcycle trip. A repo was created. Folders were made. The first commit was pushed.
 
-**Date:** [01/10]
+**But a story is not written in one draft.**
 
-**Goal:** Create clean project structure and push to GitHub.
+---
 
-**Actions:**
-- Deleted old Project VOLT folder
-- Deleted old GitHub repo
-- Created fresh GitHub repo: https://github.com/Shafhere/VOLT
-- Created minimal folder structure
-- Created .gitignore, .env.example, README.md, steps.md
-- Initialized git and pushed
+## Day 1 — The Grandmother's Story (Oct 2)
 
-**Git commands used:**
+A new story emerged.
+
+**My grandmother is 72. She lives in a village near Kochi. For 8 years, she was eligible for a widow pension of ₹2,000/month. She never received it — not because she didn't qualify, but because nobody told her.**
+
+That's the problem. Information is fragmented, English-only, and buried.
+
+**The decision:** Change the project from VOLT (travel) to **Sahayak** — a multilingual agentic system that finds government schemes a citizen qualifies for.
+
+**What happened next:**
+- GitHub repo renamed from `VOLT` → `Sahayak`
+- Local folder renamed
+- Remote URL updated
+- README rewritten with the new story
+- Three architecture diagrams drawn on paper and photographed
+  - `docs/arch_system.jpeg` — the 5-layer system
+  - `docs/arch_workflow.jpeg` — 5 agents and their loop
+  - `docs/arch_state.jpeg` — the baton
+
+**Why:** A stronger, more personal, more unique story than travel.
+
+---
+
+## Day 2 — Choosing the Tools (Oct 2)
+
+The system needs tools. Not because they're popular — because each solves a real problem.
+
+**What was decided:**
+- **LangGraph** — because the workflow has branches and loops
+- **ChromaDB + BM25 + RRF + reranker** — because scheme names need keyword AND semantic search
+- **XGBoost** — to predict eligibility
+- **myScheme API + MCP** — for live scheme data
+- **FastAPI + PostgreSQL + Streamlit** — the backend + UI
+- **Docker + free-tier hosting** — deployable without cost
+
+**The documents written:**
+- `docs/technology_selection.md` — every tool and why
+- `docs/requirements.md` — what the system must do
+
+**Why this matters:** In an interview, "I chose X because Y" beats "I used X" every time.
+
+---
+
+## Day 3 — The Baton (Oct 2)
+
+Every relay race needs a baton. In Sahayak, the baton is called **`SahayakState`**.
+
+It has 8 compartments. Every agent reads it, writes to it, passes it on.
+
+**The contracts — 4 Pydantic schemas:**
+
+| File | What it defines |
+|------|-----------------|
+| `app/schemas/citizen.py` | `CitizenProfile` — structured user details |
+| `app/schemas/scheme.py` | `Scheme` and `Eligibility` — one scheme, one verdict |
+| `app/schemas/plan.py` | `ActionPlan` and `CriticVerdict` — the answer, the judgment |
+| `app/workflows/state.py` | `SahayakState` — the baton |
+
+**The drawings:**
+- The baton (8 compartments)
+- The ER diagram (6 tables)
+- The agent flow (6 nodes, 1 loop)
+
+**The 6 database tables:**
+- `citizens` — who the user is
+- `sessions` — one row per planning run
+- `agent_runs` — every agent call logged (our tracing)
+- `retrieval_logs` — every RAG query logged (our evaluation)
+- `schemes` — cached scheme data
+- `action_plans` — every generated plan (history)
+
+**Verification:** All 4 Python files imported successfully. Everything pushed to GitHub.
+
+---
+
+## Coming Next
+
+- **Day 4:** Prompt architecture — how each agent thinks
+- **Day 5:** Data sources — where the schemes come from
+- **Day 6:** The LangGraph wiring
+- **Day 7:** Week 1 review
+- **Week 2:** Build the core intelligence
+- **Week 3:** Build the agentic engine
+- **Week 4:** Deploy and evaluate
+
+---
+
+## The Rule
+
+Every day: **build one thing, log it in this file, commit, push.**
+
+One commit per day. No exceptions.
+
+---
+
+## Git Ritual
+
+Every day:
+
 ```cmd
-
-git init
-
 git add .
-
-git commit -m "chore: initial clean setup"
-
-git branch -M main
-
-git remote add origin https://github.com/Shafhere/VOLT.git
-
-git push -u origin main
-
-## Day 2 — Project Rebrand & Topic Lock
-
-**Date:** [02/10]
-
-**Decision:** Changed project from VOLT (travel) to Sahayak (government scheme finder).
-
-**Reason:** Stronger story (personal — grandmother's missed pension), stronger social impact, native multilingual, native document verification, deeper ML, more unique.
-
-**Actions:**
-- Renamed GitHub repo to `Sahayak`
-- Updated local folder name
-- Updated remote URL
-- Updated README and .env.example
-
-**Git commands:**
-```cmd
-git remote set-url origin https://github.com/Shafhere/Sahayak.git
-git add .
-git commit -m "chore: rebrand to Sahayak — government scheme finder"
+git commit -m "type: short message"
 git push
-
-
-**Files added:**
-- docs/arch_system.jpeg
-- docs/arch_workflow.jpeg
-- docs/arch_state.jpeg
-
-
-## Day 3 — Technology Selection & Requirements
-
-
-**Goal:** Document tech choices and system requirements.
-
-**Files added:**
-- docs/06_technology_selection.md
-- docs/07_requirements.md
-
-**Key decisions:**
-- 5-agent architecture locked
-- ChromaDB + BM25 + RRF + rerank for RAG
-- XGBoost for eligibility (CNN/BiLSTM to Future Roadmap)
-- myScheme API + MCP for live data
-- Free-tier deployment only
-
-**End of day status:**
-- [x] Tech selection documented
-- [x] Requirements documented
-
----
-
-
-## Day 4 — State Design, Schemas, ER Diagram
-
-**Date:** [fill in]
-
-**Goal:** Define data contracts, state flow, and database schema.
-
-**Files added:**
-- app/schemas/citizen.py       (CitizenProfile)
-- app/schemas/scheme.py        (Scheme, Eligibility)
-- app/schemas/plan.py          (ActionPlan, CriticVerdict)
-- app/workflows/state.py       (SahayakState)
-
-**Drawn in notebook:**
-- SahayakState — the baton (8 compartments)
-- ER diagram (6 tables)
-- Agent flow (6 nodes, 1 loop)
-
-**Key decisions:**
-- State is a TypedDict — LangGraph standard
-- Schemas are Pydantic v2 — structured output validation
-- 6 tables: citizens, sessions, agent_runs, retrieval_logs, schemes, action_plans
-- Max 3 replan iterations
-
-**End of day status:**
-- [x] Pydantic schemas defined
-- [x] LangGraph state defined
-- [x] ER diagram drawn
-- [x] State flow diagram drawn
