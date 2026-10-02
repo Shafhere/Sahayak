@@ -116,3 +116,34 @@ Every day:
 git add .
 git commit -m "type: short message"
 git push
+
+
+---
+
+## Day 5 — The Voice of the System (Oct 2)
+
+**Once upon a time**, we had 5 agents with no instructions. Today, we gave each one its manual.
+
+**What we built:**
+- `app/prompts/understanding/v1.yaml` — extract structured profile from any language
+- `app/prompts/research/v1.yaml` — find schemes with citations, never invent
+- `app/prompts/planning/v1.yaml` — build an action plan in simple language
+- `app/prompts/critic/v1.yaml` — validate the plan, only flag real issues
+- `app/prompts/replanner/v1.yaml` — fix only what the critic flagged
+
+**Why YAML:**
+- Prompts live outside code
+- Versioning built in (v1, v2, v3)
+- Easy to A/B test
+- Easy to commit and track changes
+
+**Key design choices:**
+- Every prompt has role + task + rules + input + output
+- Grounding rule: never invent schemes
+- Critic rule: only flag real issues (avoid infinite loops)
+- Replanner rule: fix only what's broken (differential replanning)
+
+**End of day status:**
+- [x] All 5 prompts written
+- [x] Folder structure for prompts created
+- [x] Prompts pushed to GitHub
