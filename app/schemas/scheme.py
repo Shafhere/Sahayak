@@ -13,6 +13,8 @@ class Scheme(BaseModel):
     documents_required: list[str]
     source_url: str
     citation: str
+    deadline_date: str | None = None
+    deadline_type: str = "rolling"
 
 
 class Eligibility(BaseModel):
@@ -21,3 +23,4 @@ class Eligibility(BaseModel):
     eligible: bool
     reason: str
     confidence: float
+    missing_requirements: list[str] = []

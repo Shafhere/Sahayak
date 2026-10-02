@@ -13,4 +13,5 @@ class CitizenProfile(BaseModel):
     category: Literal["general", "obc", "sc", "st", "ews"]
     family_size: int
     language: Literal["en", "hi", "ml", "ta"]
+    life_events: list[str] = []
     raw_input: str
