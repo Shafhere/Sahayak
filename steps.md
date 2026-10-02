@@ -150,6 +150,39 @@ That's what we're building. Not just code. A bridge.
 
 ---
 
+
+
+---
+
+## Day 8.9 — Final Feature Set Locked
+
+After exploring many additions, finalized V1 scope:
+
+**Core:** 5 agents + RAG + live data + XGBoost + multilingual
+
+**Prompt-driven features (no architecture change):**
+1. Life Event Triggers — "my husband died" → widow pension
+2. Deadline Dashboard — schemes sorted by urgency
+3. "Why Not" Explainer — for rejected schemes, show the gap
+
+**New tools:**
+4. Voice Input (Groq Whisper) — multilingual speech → text
+5. Document OCR (Groq Llama 3.2 Vision) — document photo → auto-fill
+
+**Dropped/deferred:** Knowledge Graph, Family Mode, Autonomous Monitoring, Multi-Agent Debate
+
+**Timeline:** +2 days for Voice + OCR. Fits in buffer week.
+
+**The final V1 story:**
+> "Sahayak is a multilingual agentic system that listens for life events, speaks your language, reads your documents, and turns them into a grounded, deadline-aware action plan."
+
+**End of Day 8:**
+- [x] Final feature set locked
+- [x] future_roadmap.md cleaned
+- [x] Ready for Day 9
+
+---
+
 ## The Rule
 
 Every day:
