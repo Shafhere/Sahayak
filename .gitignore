@@ -38,3 +38,5 @@ logs/
 
 # Jupyter
 .ipynb_checkpoints/
+
+!data/raw/COLLECTION_LOG.md
