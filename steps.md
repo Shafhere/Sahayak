@@ -120,6 +120,36 @@ That's what we're building. Not just code. A bridge.
 
 ---
 
+---
+
+## Day 8 — Sahayak Breathes (Week 2 Begins)
+
+**Once upon a time**, Sahayak was only a plan. Today, it became running software.
+
+**Challenges hit and solved:**
+1. Python 3.14 too new → switched venv to Python 3.11
+2. Package dependency conflict → removed version pins, let pip resolve
+3. Wrong database driver → changed URL to `postgresql+psycopg2`
+4. Local PostgreSQL on 5432 → moved Docker to 5433
+5. Stale Docker volume with old password → `docker compose down -v`
+6. Two local Postgres services (v17, v18) → stopped and disabled via admin
+
+**What was set up:**
+- `.env` with Groq API key, local embeddings, DB URL
+- `requirements.txt` with ~30 packages (no pins)
+- `docker-compose.yml` — PostgreSQL 16 on port 5433
+- `scripts/test_db.py` — connection verified
+
+**End of Day 8:**
+- [x] Dependencies installed (Python 3.11 venv)
+- [x] PostgreSQL running in Docker
+- [x] Python ↔ PostgreSQL connection working
+- [x] First real infrastructure debug complete
+
+**Milestone:** Sahayak runs. Tomorrow we build the memory (SQLAlchemy models).
+
+---
+
 ## The Rule
 
 Every day:
