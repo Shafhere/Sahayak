@@ -327,6 +327,44 @@ Garbage in → garbage out. If we embed messy PDF text, retrieval fails. Clean t
 **Milestone:** The library is stocked. Tomorrow, we make it searchable.
 
 ---
+---
+
+## Day 11 — The Embeddings (ChromaDB)
+
+**Once upon a time**, Sahayak could search by keywords but not by meaning. Today, we taught it to understand.
+
+**The idea:** Every chunk gets a "fingerprint" — a 384-number vector. Similar meanings → similar vectors.
+
+**Files created:**
+- `app/rag/embed.py` — loads sentence-transformers, embeds text
+- `app/rag/vector_store.py` — ChromaDB wrapper (add, search, count, reset)
+- `scripts/build_index.py` — reads JSONs, embeds all chunks, stores in ChromaDB
+- `scripts/test_search.py` — verifies semantic search works
+
+**The flow:**
+
+34 JSONs → ~180 chunks → embed each → store in ChromaDB
+
+
+**Model:** `BAAI/bge-small-en-v1.5` (local, free, ~130 MB)
+
+**Test result:**
+Query: *"My husband died, what help can I get?"*
+Top result: **Indira Gandhi National Widow Pension Scheme** ✅
+Even though the word "widow" wasn't in the query.
+
+**Why this matters:**
+Real users don't search by scheme names. They search by their situation. Semantic search bridges the gap.
+
+**End of Day 11:**
+- [x] Knowledge base is searchable by meaning
+- [x] ~180 chunks embedded in ChromaDB
+- [x] Semantic search verified
+- [x] Ready for Day 12 (hybrid retrieval + reranking)
+
+**Milestone:** Sahayak understands meaning, not just words.
+
+---
 
 ## The Rule
 
