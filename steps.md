@@ -240,6 +240,53 @@ And underneath all of it — a story. A grandmother. A pension. ₹1.92 lakh she
 
 ---
 
+## Day 9 — The Memory (SQLAlchemy Models)
+
+**Once upon a time**, Sahayak had amnesia. Today, it remembers.
+
+**The idea:** Short-term memory (the baton/SahayakState) exists only during a session. Long-term memory (PostgreSQL) survives after. Today, we built long-term memory.
+
+**Six tables, six jobs:**
+
+| Table | Purpose |
+|-------|---------|
+| `citizens` | User profiles (with life_events) |
+| `sessions` | One row per planning run |
+| `agent_runs` | Every agent call logged (our tracing) |
+| `retrieval_logs` | Every RAG query logged (our evaluation) |
+| `schemes` | Cached scheme data (with deadline fields) |
+| `action_plans` | Every generated plan (history) |
+
+**Files created:**
+- `app/database.py` — engine + session factory + Base
+- `app/models/__init__.py` — imports all models
+- `app/models/citizen.py`
+- `app/models/session.py`
+- `app/models/agent_run.py`
+- `app/models/retrieval_log.py`
+- `app/models/scheme.py`
+- `app/models/action_plan.py`
+- `scripts/init_db.py` — creates all tables
+
+**A small hurdle solved:** `ModuleNotFoundError: No module named 'app'`
+- Fix: Added `sys.path.insert(0, ...)` to `init_db.py` so Python finds the project root
+- Why: When running scripts from `scripts/`, Python doesn't automatically look at the parent folder
+
+**Verification:**
+- `python scripts/init_db.py` → "Tables created successfully!"
+- `psql \dt` → shows all 6 tables
+- `psql \d citizens` → columns match schema
+
+**End of Day 9:**
+- [x] 6 tables created in PostgreSQL
+- [x] Schema verified
+- [x] Ready for Day 10 (PDF ingestion)
+
+**Milestone:** Sahayak now has long-term memory. Every session, plan, and agent call can be saved.
+
+---
+
+
 ## The Rule
 
 Every day:
