@@ -285,7 +285,48 @@ And underneath all of it — a story. A grandmother. A pension. ₹1.92 lakh she
 **Milestone:** Sahayak now has long-term memory. Every session, plan, and agent call can be saved.
 
 ---
+---
 
+## Day 10 — Feeding the Library
+
+**Once upon a time**, Sahayak had memory but nothing to remember. Today, we fed it 35 government scheme documents.
+
+**The pipeline (5 steps):**
+1. **Extract** — pypdf reads text from each PDF
+2. **Clean** — removes page numbers, extra spaces, headers/footers
+3. **Chunk** — splits into ~2000-char pieces with 200-char overlap
+4. **Tag** — attaches metadata (state, category, life_events, income_limit)
+5. **Save** — writes as JSON to `data/knowledge_base/`
+
+**Files created:**
+- `app/rag/__init__.py`
+- `app/rag/extract.py` — PDF → raw text
+- `app/rag/clean.py` — remove artifacts
+- `app/rag/chunk.py` — split with overlap
+- `app/rag/ingest.py` — orchestrates one PDF
+- `scripts/run_ingestion.py` — runs the pipeline on all files
+- `data/raw/metadata.yaml` — manual metadata for key schemes
+
+**A small hurdle solved:** `ModuleNotFoundError: No module named 'app'` in `ingest.py`
+- Fix: same `sys.path.insert` pattern as `init_db.py`
+- Why: scripts in subfolders need to know the project root
+
+**Output:**
+- 34 PDFs → 34 JSON files in `data/knowledge_base/`
+- Each JSON has: `metadata`, `text`, `chunks[]`, `num_chunks`, `char_count`
+
+**Why this matters:**
+Garbage in → garbage out. If we embed messy PDF text, retrieval fails. Clean text + good metadata = accurate retrieval.
+
+**End of Day 10:**
+- [x] Ingestion pipeline built
+- [x] 34 documents processed
+- [x] Knowledge base ready for embedding
+- [x] Ready for Day 11 (ChromaDB)
+
+**Milestone:** The library is stocked. Tomorrow, we make it searchable.
+
+---
 
 ## The Rule
 
