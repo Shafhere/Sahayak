@@ -5,6 +5,7 @@ from app.models.agent_run import AgentRun
 from app.models.retrieval_log import RetrievalLog
 from app.models.scheme import Scheme
 from app.models.action_plan import ActionPlan
+from app.models.user import User
 
 __all__ = [
     "Citizen",
@@ -13,4 +14,5 @@ __all__ = [
     "RetrievalLog",
     "Scheme",
     "ActionPlan",
+    "User",
 ]

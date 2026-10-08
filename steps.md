@@ -487,6 +487,51 @@ This is production-grade retrieval. Vector search alone gets ~65% top-1. Hybrid 
 - [x] Ready for Day 13 (Authentication)
 
 ---
+---
+
+## Day 13 — Authentication + Users
+
+**The story:** Sahayak had no gate. Anyone could query anything. Today, we built the front door.
+
+**Two concepts:**
+- **Authentication** — who are you? (JWT token)
+- **Authorization** — what can you do? (3 roles: citizen, social_worker, admin)
+
+**Files created:**
+- `app/models/user.py` — User table
+- `app/schemas/user.py` — Signup, Login, UserResponse, TokenResponse
+- `app/auth/__init__.py`
+- `app/auth/passwords.py` — bcrypt
+- `app/auth/jwt.py` — JWT creation + verification
+- `app/auth/dependencies.py` — get_current_user, require_role
+- `app/api/auth.py` — /signup, /login, /me
+- `app/main.py` — FastAPI app
+
+**Packages:** pyjwt, passlib[bcrypt], python-multipart
+
+**Database:** New `users` table (7 tables total now)
+
+**Tests passed:**
+- Health check ✅
+- Signup ✅
+- Login returns JWT ✅
+- Protected endpoint with token ✅
+- Protected endpoint without token → 401 ✅
+
+**Why this matters:**
+Real apps need identity. Without auth, Sahayak couldn't be deployed publicly. Now citizens have private histories, social workers can help multiple people, admins can see analytics.
+
+**End of Day 13:**
+- [x] User table + JWT auth
+- [x] Signup/login endpoints
+- [x] Protected routes
+- [x] Role-based authorization ready
+- [x] Ready for Day 14 (Understanding Agent)
+
+---
+
+
+
 ## The Rule
 
 Every day:
