@@ -582,7 +582,55 @@ Real apps need identity. Without auth, Sahayak couldn't be deployed publicly. No
 - [x] Ready for Day 14 (Understanding Agent)
 
 ---
+---
 
+## Day 14 — The Understanding Agent
+
+**The story:** Sahayak had a gate but no listener. Today, the Understanding Agent woke up.
+
+**What it does:**
+- Reads natural language in English, Hindi, Malayalam, or Tamil
+- Detects mode (scheme, mentor, journey, companion, care)
+- Detects emotion (grief, confusion, hope, urgency, neutral)
+- Extracts structured profile (age, gender, income, state, category)
+- Detects life events (spouse_death, child_birth, retirement)
+- Lists missing fields for follow-up questions
+
+**Files created:**
+- `app/agents/understanding.py` — the agent
+- `scripts/test_understanding.py` — test script
+
+**Updated:**
+- `app/schemas/citizen.py` — added mode, emotion, missing_fields
+- `app/prompts/understanding/v1.yaml` — new rules (v2.0)
+
+**How it works:**
+1. Loads versioned YAML prompt
+2. Sends prompt + user message to Groq Llama 3.1 70B
+3. Forces JSON output (`response_format={"type": "json_object"}`)
+4. Validates with Pydantic `CitizenProfile`
+5. Returns structured profile
+
+**Test results (5 inputs):**
+
+| Test | Mode | Emotion |
+|------|:----:|:-------:|
+| Malayalam widow | scheme | grief |
+| English student | mentor | hope |
+| English travel | journey | hope |
+| Hindi scholarship | scheme | neutral |
+| Emotional distress | care | grief |
+
+**Why this matters:**
+This is the first real agent. It converts messy human language into structured data — the foundation for everything downstream. The mode detection enables the 3-mode architecture. The emotion detection enables empathetic responses.
+
+**End of Day 14:**
+- [x] Understanding Agent built
+- [x] 5 tests passed
+- [x] Mode + emotion detection working
+- [x] Ready for Day 15 (Research Agent)
+
+---
 
 
 ## The Rule
