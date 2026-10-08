@@ -1,6 +1,6 @@
 """FastAPI dependencies for authentication and authorization."""
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 import jwt as pyjwt
 
@@ -9,11 +9,12 @@ from app.models.user import User
 from app.auth.jwt import decode_access_token
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+# HTTPBearer — Swagger will just ask for a token (no username/password)
+security = HTTPBearer()
 
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db),
 ) -> User:
     """Extract the current user from the JWT token."""
@@ -23,7 +24,7 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = decode_access_token(token)
+        payload = decode_access_token(credentials.credentials)
         user_id = int(payload.get("sub"))
     except (pyjwt.PyJWTError, TypeError, ValueError):
         raise credentials_exception
