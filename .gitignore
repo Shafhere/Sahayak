@@ -40,3 +40,5 @@ logs/
 .ipynb_checkpoints/
 
 !data/raw/COLLECTION_LOG.md
+
+.cache/
