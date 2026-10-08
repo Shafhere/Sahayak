@@ -440,6 +440,53 @@ Real users search by situation, not scheme names. Hybrid retrieval combines sema
 
 ---
 
+---
+
+## Day 12 — Hybrid Retrieval + Reranking ✅
+
+**The problem:** Vector-only retrieval gave 33% top-1 accuracy (Day 11 baseline).
+
+**The fix — 3 layers:**
+
+1. **BM25** (`app/rag/bm25.py`) — keyword search. Boosts exact term matches.
+2. **RRF** (`app/rag/rrf.py`) — Reciprocal Rank Fusion. Merges vector + BM25 rankings.
+3. **Cross-Encoder reranker** (`app/rag/rerank.py`) — re-scores top candidates for true relevance.
+
+**Test results (5 queries):**
+
+| Query | Top-1 Result | Correct? |
+|-------|-------------|:--------:|
+| "My husband died" | Kerala Widow Pension | ✅ |
+| "Daughter's college money" | Postmatric Scholarship EBC | ✅ |
+| "Kerala health scheme" | Cancer Suraksha | ✅ |
+| "Widow needs pension" | Indira Gandhi Widow Pension | ✅ |
+| "OBC scholarship after 12th" | Postmatric OBC/EBC/DNT | ✅ |
+
+**Top-1 accuracy: 33% → 100%**
+
+**Understanding the rerank scores:**
+- Cross-encoder produces unbounded scores (can be negative)
+- What matters is relative ranking within each query
+- Query 1 top: -5.88 beat -7.95 (ranking correct)
+- Query 3 top: +6.37 clearly best
+
+**Files created:**
+- `app/rag/bm25.py`
+- `app/rag/rrf.py`
+- `app/rag/rerank.py`
+
+**Updated:**
+- `scripts/test_search.py` — hybrid search with 5 test queries
+
+**Why this matters:**
+This is production-grade retrieval. Vector search alone gets ~65% top-1. Hybrid + rerank gets 85%+. My test showed 100% on 5 queries.
+
+**End of Day 12:**
+- [x] Hybrid retrieval working
+- [x] 5/5 queries correct
+- [x] Ready for Day 13 (Authentication)
+
+---
 ## The Rule
 
 Every day:
