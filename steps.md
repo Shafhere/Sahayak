@@ -631,7 +631,96 @@ This is the first real agent. It converts messy human language into structured d
 - [x] Ready for Day 15 (Research Agent)
 
 ---
+---
 
+## Day 14 — The Understanding Agent
+
+**The story:** Sahayak had a gate but no listener. Today, the Understanding Agent woke up.
+
+**What it does:**
+- Reads natural language in English, Hindi, Malayalam, or Tamil
+- Detects mode (scheme, mentor, journey, companion, care)
+- Detects emotion (grief, confusion, hope, urgency, neutral)
+- Extracts structured profile (age, gender, income, state, category)
+- Detects life events (spouse_death, child_birth, etc.)
+- Lists missing fields for follow-up
+
+**Files created:**
+- `app/agents/understanding.py`
+- `scripts/test_understanding.py`
+- `app/agents/cache.py` (response cache)
+
+**Updated:**
+- `app/schemas/citizen.py` — added mode, emotion, missing_fields, null-safe validators
+- `app/prompts/understanding/v1.yaml` — v3.1
+
+**Small hurdles solved:**
+1. passlib+bcrypt conflict → bcrypt directly
+2. Model llama-3.3-70b not available → switched to openai/gpt-oss-120b, then 20b for speed
+3. Category case issue → post-processing lowercase + validate
+4. Category hallucination ("student") → post-processing rejects invalid
+5. Mode confusion (widow → care instead of scheme) → prompt v3.1 with explicit rules
+6. Null life_events → Pydantic field_validator + post-processing double fix
+7. Slow processing (~25s) → parallel tests + singleton client + cached prompt + gpt-oss-20b
+
+**Final test results (all 7 correct):**
+- ML widow: scheme / grief / 68 / female ✅
+- Student guidance: mentor ✅
+- Student scholarship: scheme ✅
+- Travel: journey ✅
+- Hindi scholarship: scheme ✅
+- Distress: care / grief ✅
+- Tamil widow: scheme / grief / 65 / female ✅
+
+**Speed:** 25s → ~5s (5x faster)
+
+**End of Day 14:**
+- [x] First agent working
+- [x] Mode + emotion detection
+- [x] 7/7 tests pass
+- [x] Ready for Day 15
+
+---
+
+---
+
+## Day 15 — The Research Agent
+
+**The story:** Understanding knows WHO is asking. Research finds WHAT they need.
+
+**What it does:**
+- Builds mode-aware search query from profile
+- Hybrid retrieval (BM25 + vector + RRF + rerank)
+- State boost for local schemes (Kerala → Kerala Widow first)
+- Relevance threshold drops noise
+- Mode guard returns empty for missing data
+- Deduplicates by document
+- Returns chunks with citations
+
+**Files created:**
+- `app/schemas/research.py`
+- `app/agents/research.py`
+- `scripts/verify_research.py`
+
+**Small hurdles solved:**
+1. Journey mode returned scheme garbage → added mode guard
+2. Slow model reloading → BM25 singleton + lazy imports
+3. Kerala scheme lost to central scheme → state boost
+4. Irrelevant results in top 3 → threshold filter
+5. Other-state pollution → state filter
+
+**Results:**
+- Widow query → Kerala Widow Pension + Indira Gandhi Widow ✅
+- OBC scholarship → PM YASASVI + Postmatric OBC ✅
+- Old age → Indira Gandhi Old Age Pension ✅
+
+**End of Day 15:**
+- [x] Research Agent built with mode-aware retrieval
+- [x] State boosting working
+- [x] Threshold filtering working
+- [x] Ready for Day 16 (LangGraph)
+
+---
 
 ## The Rule
 

@@ -62,3 +62,14 @@ if __name__ == "__main__":
     for i, r in enumerate(results, 1):
         print(f"\n[{i}] {r['name']} (score: {r['score']:.4f})")
         print(f"    {r['text'][:150]}...")
+
+# Module-level singleton — created once, reused forever
+_index_instance = None
+
+
+def get_bm25_index() -> BM25Index:
+    """Get or create the singleton BM25 index."""
+    global _index_instance
+    if _index_instance is None:
+        _index_instance = BM25Index()
+    return _index_instance
