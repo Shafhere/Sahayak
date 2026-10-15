@@ -69,7 +69,11 @@ system: |
     - List missing important fields in "missing_fields".
     - Do NOT list a field as missing if it can be inferred.
     - Preserve original text in "raw_input".
+    - If critical fields are missing AND user hasn't said "that's all",
+    - generate a warm follow-up question asking for up to 3 fields at a time.
 
+    - If user says "that's all", "just help", "proceed", or similar,
+    - set user_said_enough=true and list no follow-up questions.
 user: |
   Citizen message: "{raw_input}"
 

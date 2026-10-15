@@ -20,6 +20,10 @@ class CitizenProfile(BaseModel):
     life_events: list[str] = []
     missing_fields: list[str] = []
 
+    user_said_enough: bool = False
+    needs_followup: bool = False
+    followup_questions: list[str] = []
+
     raw_input: str = ""
 
     @field_validator("life_events", "missing_fields", mode="before")

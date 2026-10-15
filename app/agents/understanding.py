@@ -139,6 +139,24 @@ def _postprocess(data: dict, raw_input: str) -> dict:
 
     return data
 
+def _should_ask_followup(profile) -> tuple[bool, list[str]]:
+    CRITICAL = {
+        "scheme": ["state", "category", "annual_income"],
+        "mentor": ["interests", "career_goal", "annual_income", "category", "state"],
+        "journey": ["origin", "destination", "duration", "budget"],
+    }
+    if profile.user_said_enough:
+        return False, []
+    
+    missing = [f for f in CRITICAL.get(profile.mode, []) 
+               if getattr(profile, f, None) is None]
+    
+    if not missing:
+        return False, []
+    
+    # Ask for the most important ones (max 3)
+    return True, missing[:3]
+
 
 def understand(user_input: str) -> CitizenProfile:
     """Read a citizen's message and return a structured CitizenProfile."""
