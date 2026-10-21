@@ -1,0 +1,96 @@
+{
+  "version": "1.0",
+  "description": "Golden dataset for RAG retrieval evaluation on Sahayak",
+  "queries": [
+    {
+      "id": "q01",
+      "query": "My husband died, what pension can I get?",
+      "category": "widow_pension",
+      "expected_docs": ["kerala_widow_pension", "widow_pension"]
+    },
+    {
+      "id": "q02",
+      "query": "I am 65 years old and retired, need pension",
+      "category": "old_age",
+      "expected_docs": ["old_age_pension", "kerala_old_age_pension"]
+    },
+    {
+      "id": "q03",
+      "query": "Kerala widow pension eligibility criteria",
+      "category": "widow_pension",
+      "expected_docs": ["kerala_widow_pension"]
+    },
+    {
+      "id": "q04",
+      "query": "OBC scholarship after 12th standard",
+      "category": "scholarship",
+      "expected_docs": ["postmatric_scholarship_obc_ebc_dnt", "pm_yasasvi_postmatric_obc"]
+    },
+    {
+      "id": "q05",
+      "query": "PM YASASVI scholarship for OBC students",
+      "category": "scholarship",
+      "expected_docs": ["pm_yasasvi_postmatric_obc", "pm_yasasvi_prematric_obc"]
+    },
+    {
+      "id": "q06",
+      "query": "Scholarship for SC students in class 9 and 10",
+      "category": "scholarship",
+      "expected_docs": ["prematric_scholarship_sc_class9_10"]
+    },
+    {
+      "id": "q07",
+      "query": "Kerala health insurance scheme for BPL families",
+      "category": "health",
+      "expected_docs": ["karunya_health_insurance"]
+    },
+    {
+      "id": "q08",
+      "query": "Cancer treatment financial help Kerala",
+      "category": "health",
+      "expected_docs": ["cancer_suraksha"]
+    },
+    {
+      "id": "q09",
+      "query": "Pension scheme for elderly in Kerala",
+      "category": "old_age",
+      "expected_docs": ["kerala_old_age_pension", "old_age_pension"]
+    },
+    {
+      "id": "q10",
+      "query": "How to get income certificate in Kerala",
+      "category": "general",
+      "expected_docs": ["Income_Certificate_Process_Kerala"]
+    },
+    {
+      "id": "q11",
+      "query": "What documents are needed for scheme application",
+      "category": "general",
+      "expected_docs": ["Documents_Required_for_Scheme_Applications"]
+    },
+    {
+      "id": "q12",
+      "query": "How to apply for government schemes",
+      "category": "general",
+      "expected_docs": ["How_to_Apply_for_Government_Schemes"]
+    },
+    {
+      "id": "q13",
+      "query": "Atal Pension Yojana eligibility",
+      "category": "pension",
+      "expected_docs": ["atal_pension_yojana"]
+    },
+    {
+      "id": "q14",
+      "query": "Scholarship for disabled students",
+      "category": "scholarship",
+      "expected_docs": ["postmatric_scholarship_disabilities"]
+    },
+    {
+      "id": "q15",
+      "query": "Financial help for disabled person in Kerala",
+      "category": "health",
+      "expected_docs": ["financial_assistance_disabled_students", "distress_relief_differently_abled"]
+    }
+  ]
+}

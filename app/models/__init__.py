@@ -16,3 +16,6 @@ __all__ = [
     "ActionPlan",
     "User",
 ]
+
+#each file defines one SQLAlchemy model. A model is a Python class that maps to a database table.
+#Seven tables around three concerns: memory (citizens, sessions, action_plans), observability (agent_runs, retrieval_logs), and caching (schemes, users)."

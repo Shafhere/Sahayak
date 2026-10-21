@@ -1,0 +1,223 @@
+{
+  "total": 15,
+  "top1": 12,
+  "top3": 15,
+  "top5": 15,
+  "top1_pct": 80.0,
+  "top3_pct": 100.0,
+  "top5_pct": 100.0,
+  "mrr": 0.9,
+  "precision_at_3": 0.3778,
+  "results": [
+    {
+      "id": "q01",
+      "query": "My husband died, what pension can I get?",
+      "expected": [
+        "kerala_widow_pension",
+        "widow_pension"
+      ],
+      "retrieved": [
+        "atal_pension_yojana",
+        "widow_pension",
+        "pm_kisan_maandhan",
+        "kerala_widow_pension"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q02",
+      "query": "I am 65 years old and retired, need pension",
+      "expected": [
+        "old_age_pension",
+        "kerala_old_age_pension"
+      ],
+      "retrieved": [
+        "atal_pension_yojana",
+        "old_age_pension",
+        "pm_kisan_maandhan"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q03",
+      "query": "Kerala widow pension eligibility criteria",
+      "expected": [
+        "kerala_widow_pension"
+      ],
+      "retrieved": [
+        "kerala_widow_pension",
+        "snehayanam",
+        "kerala_old_age_pension",
+        "widow_pension",
+        "aswasakiranam"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q04",
+      "query": "OBC scholarship after 12th standard",
+      "expected": [
+        "postmatric_scholarship_obc_ebc_dnt",
+        "pm_yasasvi_postmatric_obc"
+      ],
+      "retrieved": [
+        "postmatric_scholarship_obc_ebc_dnt",
+        "pm_yasasvi_postmatric_obc",
+        "pm_yasasvi_prematric_obc"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q05",
+      "query": "PM YASASVI scholarship for OBC students",
+      "expected": [
+        "pm_yasasvi_postmatric_obc",
+        "pm_yasasvi_prematric_obc"
+      ],
+      "retrieved": [
+        "postmatric_scholarship_obc_ebc_dnt",
+        "pm_yasasvi_postmatric_obc",
+        "pm_yasasvi_prematric_obc"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q06",
+      "query": "Scholarship for SC students in class 9 and 10",
+      "expected": [
+        "prematric_scholarship_sc_class9_10"
+      ],
+      "retrieved": [
+        "prematric_scholarship_sc_class9_10",
+        "postmatric_scholarship_ebc",
+        "pm_yasasvi_prematric_obc",
+        "pm_yasasvi_postmatric_obc"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q07",
+      "query": "Kerala health insurance scheme for BPL families",
+      "expected": [
+        "karunya_health_insurance"
+      ],
+      "retrieved": [
+        "karunya_health_insurance",
+        "cancer_suraksha",
+        "snehayanam"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q08",
+      "query": "Cancer treatment financial help Kerala",
+      "expected": [
+        "cancer_suraksha"
+      ],
+      "retrieved": [
+        "cancer_suraksha",
+        "karunya_health_insurance",
+        "aswasakiranam"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q09",
+      "query": "Pension scheme for elderly in Kerala",
+      "expected": [
+        "kerala_old_age_pension",
+        "old_age_pension"
+      ],
+      "retrieved": [
+        "kerala_old_age_pension",
+        "aswasakiranam",
+        "kerala_widow_pension",
+        "cancer_suraksha"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q10",
+      "query": "How to get income certificate in Kerala",
+      "expected": [
+        "Income_Certificate_Process_Kerala"
+      ],
+      "retrieved": [
+        "Income_Certificate_Process_Kerala",
+        "karunya_health_insurance",
+        "financial_assistance_disabled_students",
+        "Caste_Certificate_Process_Kerala",
+        "kerala_old_age_pension"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q11",
+      "query": "What documents are needed for scheme application",
+      "expected": [
+        "Documents_Required_for_Scheme_Applications"
+      ],
+      "retrieved": [
+        "Documents_Required_for_Scheme_Applications",
+        "karunya_health_insurance",
+        "snehayanam",
+        "How_to_Apply_for_Government_Schemes"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q12",
+      "query": "How to apply for government schemes",
+      "expected": [
+        "How_to_Apply_for_Government_Schemes"
+      ],
+      "retrieved": [
+        "How_to_Apply_for_Government_Schemes",
+        "Documents_Required_for_Scheme_Applications",
+        "karunya_health_insurance",
+        "pm_vishwakarma",
+        "aswasakiranam"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q13",
+      "query": "Atal Pension Yojana eligibility",
+      "expected": [
+        "atal_pension_yojana"
+      ],
+      "retrieved": [
+        "atal_pension_yojana",
+        "pm_kisan_maandhan"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q14",
+      "query": "Scholarship for disabled students",
+      "expected": [
+        "postmatric_scholarship_disabilities"
+      ],
+      "retrieved": [
+        "postmatric_scholarship_disabilities",
+        "prematric_scholarship_sc_class9_10"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q15",
+      "query": "Financial help for disabled person in Kerala",
+      "expected": [
+        "financial_assistance_disabled_students",
+        "distress_relief_differently_abled"
+      ],
+      "retrieved": [
+        "financial_assistance_disabled_students",
+        "aswasakiranam",
+        "matru_jyothi",
+        "distress_relief_differently_abled"
+      ],
+      "rank": 1
+    }
+  ]
+}

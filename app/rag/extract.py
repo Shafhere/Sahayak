@@ -1,4 +1,4 @@
-"""Extract text from a PDF using pypdf."""
+#Extract text from a PDF using pypdf.
 from pathlib import Path
 from pypdf import PdfReader
 

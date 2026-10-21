@@ -14,7 +14,7 @@ STATE_BOOST = 5.0           # bigger boost for local schemes
 
 
 def _build_query(profile: CitizenProfile) -> str:
-    """Build a search query from the profile, mode-aware."""
+    """Build a search query from the profile AND raw input."""
     parts = []
 
     if profile.mode == "scheme":
@@ -44,9 +44,11 @@ def _build_query(profile: CitizenProfile) -> str:
     elif profile.mode == "companion":
         parts.append("local news")
 
-    if not parts:
+    # ALWAYS include raw_input words too — profile may be incomplete
+    if profile.raw_input:
         parts.append(profile.raw_input)
 
+    # Deduplicate while preserving order
     seen = set()
     unique = []
     for p in parts:
@@ -147,6 +149,81 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
 
         if len(chunks) >= top_k:
             break
+
+            # FALLBACK: if no good chunks OR top chunk is weak, use web search
+    # We consider a chunk "strong" if rerank score is above threshold
+            # FALLBACK: use web search when KB results don't match query keywords
+    STOP_WORDS = {
+        "the", "a", "an", "and", "or", "for", "in", "on", "to", "of",
+        "is", "are", "was", "were", "what", "how", "tell", "me", "about",
+        "i", "my", "we", "our", "you", "your", "it", "this", "that",
+        "can", "could", "should", "would", "will", "may", "might",
+        "with", "from", "by", "at", "as", "into", "through", "please",
+        "want", "need", "know", "find", "get", "help",
+    }
+
+    # These words are too generic — they appear in almost every scheme doc
+    GENERIC_SCHEME_WORDS = {
+        "pm", "scheme", "yojana", "government", "india", "central",
+        "state", "eligibility", "apply", "application", "documents",
+        "required", "benefits", "details", "process", "kerala",
+        "scholarship", "pension", "senior", "citizen", "general",
+    }
+
+    # Extract meaningful words from the query (use raw_input for best results)
+    text_to_analyze = (profile.raw_input or query).lower()
+    query_words = {
+        w.strip(".,?!")
+        for w in text_to_analyze.split()
+        if len(w) > 2
+        and w.strip(".,?!") not in STOP_WORDS
+        and w.strip(".,?!") not in GENERIC_SCHEME_WORDS
+    }
+
+    # Check if any top chunk shares SPECIFIC keywords with the query
+    has_overlap = False
+    if query_words and chunks:
+        for chunk in chunks[:3]:
+            chunk_lower = chunk.text.lower()
+            matches = sum(1 for w in query_words if w in chunk_lower)
+            overlap_ratio = matches / len(query_words)
+            if overlap_ratio >= 0.5:  # need at least half the specific words
+                has_overlap = True
+                break
+
+    should_fallback = len(chunks) == 0 or (query_words and not has_overlap)
+
+    print(f"[Research] Fallback check: chunks={len(chunks)}, "
+          f"query_words={query_words}, has_overlap={has_overlap}, "
+          f"should_fallback={should_fallback}")
+
+    if should_fallback:
+        from app.tools.web_search import search as web_search
+        print(f"[Research] KB has no relevant match — trying web search")
+
+        web_results = web_search(query, max_results=5)
+
+        if web_results:
+            chunks = []
+            for i, r in enumerate(web_results):
+                chunks.append(RetrievedChunk(
+                    doc_id=f"web_{i}",
+                    name=r["title"],
+                    text=r["snippet"],
+                    rerank_score=0.0,
+                    source_url=r["url"],
+                    citation=f"{r['title']} — {r['url']}",
+                ))
+
+            return ResearchResult(
+                query=query,
+                mode=profile.mode,
+                chunks=chunks,
+                num_results=len(chunks),
+                source="web_search",
+            )
+
+        print(f"[Research] Web search also returned nothing — keeping KB result")
 
     return ResearchResult(
         query=query,
