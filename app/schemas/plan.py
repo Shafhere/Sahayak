@@ -28,4 +28,5 @@ class ActionPlan(BaseModel):
 class CriticVerdict(BaseModel):
     """Result of critic validation."""
     passed: bool
-    issues: list[str] = []
+    errors: list[str] = []     # cause failure → trigger replan
+    warnings: list[str] = []   # informational only
