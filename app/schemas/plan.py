@@ -30,3 +30,13 @@ class CriticVerdict(BaseModel):
     passed: bool
     errors: list[str] = []     # cause failure → trigger replan
     warnings: list[str] = []   # informational only
+
+
+class ActionPlan(BaseModel):
+    """Final action plan returned to the citizen."""
+    greeting: str = ""
+    eligible_schemes: list[PlannedScheme] = []
+    document_checklist: list[str] = []
+    timeline: list[TimelineStep] = []
+    next_steps: list[str] = []
+    estimated_annual_benefit: int = 0

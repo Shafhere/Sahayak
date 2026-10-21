@@ -71,6 +71,7 @@ def plan(profile: CitizenProfile, research: ResearchResult, max_chunks: int = 5)
 
     user_message = prompt["user"].format(
         profile=profile.model_dump_json(indent=2),
+        language=profile.language,
         research=chunk_text,
     )
 
