@@ -18,7 +18,7 @@ from app.schemas.citizen import CitizenProfile
 load_dotenv()
 
 PROMPT_PATH = Path("app/prompts/understanding/v1.yaml")
-MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 
 VALID_CATEGORIES = {"general", "obc", "sc", "st", "ews"}
 
@@ -54,13 +54,12 @@ AGE_PATTERNS = [
     r"\b(\d{2})\b",
 ]
 
-
 _cached_prompt = None
 _cached_client = None
 
 
 def _load_prompt() -> dict:
-    """Load prompt once, cache for reuse."""
+    """Load prompt once, cache it."""
     global _cached_prompt
     if _cached_prompt is None:
         with open(PROMPT_PATH, "r", encoding="utf-8") as f:
@@ -69,13 +68,13 @@ def _load_prompt() -> dict:
 
 
 def _get_client() -> Groq:
-    """Get or create a singleton Groq client."""
+    """Get or create the singleton Groq client."""
     global _cached_client
     if _cached_client is None:
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             raise RuntimeError("GROQ_API_KEY not set in .env")
-        _cached_client = Groq(api_key=api_key)
+        _cached_client = Groq(api_key=api_key, timeout=30.0, max_retries=2)
     return _cached_client
 
 
@@ -139,58 +138,58 @@ def _postprocess(data: dict, raw_input: str) -> dict:
 
     return data
 
-def _should_ask_followup(profile) -> tuple[bool, list[str]]:
-    CRITICAL = {
-        "scheme": ["state", "category", "annual_income"],
-        "mentor": ["interests", "career_goal", "annual_income", "category", "state"],
-        "journey": ["origin", "destination", "duration", "budget"],
-    }
-    if profile.user_said_enough:
-        return False, []
-    
-    missing = [f for f in CRITICAL.get(profile.mode, []) 
-               if getattr(profile, f, None) is None]
-    
-    if not missing:
-        return False, []
-    
-    # Ask for the most important ones (max 3)
-    return True, missing[:3]
 
-
-def understand(user_input: str) -> CitizenProfile:
+def understand(user_input: str, max_retries: int = 5) -> CitizenProfile:
     """Read a citizen's message and return a structured CitizenProfile."""
-    from app.agents.cache import get as cache_get, set as cache_set
-
     prompt = _load_prompt()
     client = _get_client()
     user_message = prompt["user"].format(raw_input=user_input)
 
-    # Try cache first
-    data = cache_get(user_input)
-    if data is None:
-        response = client.chat.completions.create(
-            model=MODEL,
-            messages=[
-                {"role": "system", "content": prompt["system"]},
-                {"role": "user", "content": user_message},
-            ],
-            temperature=0.1,
-            response_format={"type": "json_object"},
-        )
-        raw_json = response.choices[0].message.content
+    last_error = None
+
+    for attempt in range(max_retries):
         try:
+            response = client.chat.completions.create(
+                model=MODEL,
+                messages=[
+                    {"role": "system", "content": prompt["system"]},
+                    {"role": "user", "content": user_message},
+                ],
+                temperature=0.1,
+                response_format={"type": "json_object"},
+            )
+
+            raw_json = response.choices[0].message.content
+
+            if not raw_json or not raw_json.strip():
+                print(f"  [Understand] Empty response (attempt {attempt + 1}) — retrying")
+                continue
+
             data = json.loads(raw_json)
+            data = _postprocess(data, user_input)
+
+            try:
+                return CitizenProfile(**data)
+            except ValidationError as e:
+                print(f"  [Understand] Schema validation failed (attempt {attempt + 1}): {e}")
+                last_error = e
+                continue
+
         except json.JSONDecodeError as e:
-            raise ValueError(f"LLM returned invalid JSON: {e}\nRaw: {raw_json}")
-        cache_set(user_input, data)
+            print(f"  [Understand] Invalid JSON (attempt {attempt + 1}): {e}")
+            last_error = e
+            continue
 
-    data = _postprocess(data, user_input)
+        except Exception as e:
+            print(f"  [Understand] Groq error (attempt {attempt + 1}): {type(e).__name__}")
+            last_error = e
+            import time
+            time.sleep(1)
+            continue
 
-    try:
-        return CitizenProfile(**data)
-    except ValidationError as e:
-        raise ValueError(f"LLM output failed schema validation: {e}")
+    raise RuntimeError(
+        f"Understanding failed after {max_retries} attempts. Last error: {last_error}"
+    )
 
 
 if __name__ == "__main__":

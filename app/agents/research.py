@@ -150,9 +150,7 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
         if len(chunks) >= top_k:
             break
 
-            # FALLBACK: if no good chunks OR top chunk is weak, use web search
-    # We consider a chunk "strong" if rerank score is above threshold
-            # FALLBACK: use web search when KB results don't match query keywords
+    # FALLBACK: use name_match as the primary relevance signal
     STOP_WORDS = {
         "the", "a", "an", "and", "or", "for", "in", "on", "to", "of",
         "is", "are", "was", "were", "what", "how", "tell", "me", "about",
@@ -160,17 +158,19 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
         "can", "could", "should", "would", "will", "may", "might",
         "with", "from", "by", "at", "as", "into", "through", "please",
         "want", "need", "know", "find", "get", "help",
+        "lives", "live", "living", "years", "year", "old", "new",
+        "income", "money", "family", "person", "people",
     }
 
-    # These words are too generic — they appear in almost every scheme doc
     GENERIC_SCHEME_WORDS = {
         "pm", "scheme", "yojana", "government", "india", "central",
         "state", "eligibility", "apply", "application", "documents",
         "required", "benefits", "details", "process", "kerala",
         "scholarship", "pension", "senior", "citizen", "general",
+        "connection", "financial", "assistance", "welfare",
     }
 
-    # Extract meaningful words from the query (use raw_input for best results)
+    # Extract specific query words (drop stop words + generic scheme words)
     text_to_analyze = (profile.raw_input or query).lower()
     query_words = {
         w.strip(".,?!")
@@ -178,28 +178,26 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
         if len(w) > 2
         and w.strip(".,?!") not in STOP_WORDS
         and w.strip(".,?!") not in GENERIC_SCHEME_WORDS
+        and not w.strip(".,?!").isdigit()
     }
 
-    # Check if any top chunk shares SPECIFIC keywords with the query
-    has_overlap = False
+    # Primary signal: does the top chunk NAME contain a specific query word?
+    name_matches = False
     if query_words and chunks:
-        for chunk in chunks[:3]:
-            chunk_lower = chunk.text.lower()
-            matches = sum(1 for w in query_words if w in chunk_lower)
-            overlap_ratio = matches / len(query_words)
-            if overlap_ratio >= 0.5:  # need at least half the specific words
-                has_overlap = True
-                break
+        top_name = (chunks[0].name or "").lower()
+        name_matches = any(w in top_name for w in query_words)
 
-    should_fallback = len(chunks) == 0 or (query_words and not has_overlap)
+    # Decision: fallback if no chunks, or if top chunk name doesn't match
+    should_fallback = len(chunks) == 0 or (query_words and not name_matches)
 
     print(f"[Research] Fallback check: chunks={len(chunks)}, "
-          f"query_words={query_words}, has_overlap={has_overlap}, "
+          f"query_words={query_words}, "
+          f"name_match={name_matches}, "
           f"should_fallback={should_fallback}")
 
     if should_fallback:
         from app.tools.web_search import search as web_search
-        print(f"[Research] KB has no relevant match — trying web search")
+        print(f"[Research] KB relevance check failed — trying web search")
 
         web_results = web_search(query, max_results=5)
 
