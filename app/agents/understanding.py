@@ -4,6 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
+from langsmith import traceable
 import json
 import os
 import re
@@ -73,7 +74,7 @@ def _get_client() -> Groq:
     if _cached_client is None:
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
-            raise RuntimeError("GROQ_API_KEY not set in .env")
+            raise RuntimeError("GROQ_API_KEY not set")
         _cached_client = Groq(api_key=api_key, timeout=30.0, max_retries=2)
     return _cached_client
 
@@ -138,7 +139,7 @@ def _postprocess(data: dict, raw_input: str) -> dict:
 
     return data
 
-
+@traceable(run_type="chain", name="1. Understanding Agent")
 def understand(user_input: str, max_retries: int = 5) -> CitizenProfile:
     """Read a citizen's message and return a structured CitizenProfile."""
     prompt = _load_prompt()

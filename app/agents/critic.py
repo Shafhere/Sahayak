@@ -4,6 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
+from langsmith import traceable
 from app.schemas.citizen import CitizenProfile
 from app.schemas.plan import ActionPlan, CriticVerdict
 
@@ -97,7 +98,7 @@ def _check_completeness(plan: ActionPlan) -> tuple[list[str], list[str]]:
 
     return errors, warnings
 
-
+@traceable(run_type="chain", name="4. Critic Agent")
 def critique(profile: CitizenProfile, plan: ActionPlan) -> CriticVerdict:
     """
     Validate an ActionPlan using deterministic rules.

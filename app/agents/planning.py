@@ -4,6 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
+from langsmith import traceable
 import json
 import os
 import yaml
@@ -44,7 +45,7 @@ def _get_client() -> Groq:
         _cached_client = Groq(api_key=api_key, timeout=30.0, max_retries=2)
     return _cached_client
 
-
+@traceable(run_type="chain", name="3. Planning Agent")
 def plan(profile: CitizenProfile, research: ResearchResult, max_chunks: int = 5) -> ActionPlan:
     """
     Build an action plan from the citizen profile and research chunks.

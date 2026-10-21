@@ -1,6 +1,7 @@
 """Replanner Agent — fixes only the parts of a plan that the Critic flagged."""
 import sys
 from pathlib import Path
+from langsmith import traceable
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
@@ -10,6 +11,7 @@ import yaml
 from groq import Groq
 from dotenv import load_dotenv
 from pydantic import ValidationError
+
 
 from app.schemas.citizen import CitizenProfile
 from app.schemas.plan import ActionPlan
@@ -43,7 +45,7 @@ def _get_client() -> Groq:
         _cached_client = Groq(api_key=api_key, timeout=30.0, max_retries=2)
     return _cached_client
 
-
+@traceable(run_type="chain", name="5. Replanner Agent")
 def replan(
     profile: CitizenProfile,
     plan: ActionPlan,

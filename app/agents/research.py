@@ -6,7 +6,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from app.schemas.citizen import CitizenProfile
 from app.schemas.research import ResearchResult, RetrievedChunk
-
+from langsmith import traceable
 
 MODES_WITH_DATA = {"scheme"}
 MIN_RERANK_SCORE = 0.5      # stricter — drop low relevance
@@ -57,7 +57,7 @@ def _build_query(profile: CitizenProfile) -> str:
             unique.append(p)
     return " ".join(unique)
 
-
+@traceable(run_type="chain", name="2. Research Agent")
 def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
     """Find grounded information for the given profile."""
     # Lazy imports — heavy libraries only load when actually needed
