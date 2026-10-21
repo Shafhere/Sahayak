@@ -10,7 +10,7 @@ from app.rag.ingest import ingest_pdf, load_metadata
 
 RAW_DIR = Path("data/raw")
 KB_DIR = Path("data/knowledge_base")
-CATEGORIES = ["central", "kerala", "general"]
+CATEGORIES = ["central", "kerala", "general", "mentor"]
 
 
 def main():

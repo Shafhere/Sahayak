@@ -6,7 +6,6 @@ from app.schemas.plan import ActionPlan, CriticVerdict
 
 
 class SahayakState(TypedDict, total=False):
-    """The single object passed between agents."""
     raw_input: str
     mode: str
     profile: CitizenProfile | None
@@ -15,3 +14,5 @@ class SahayakState(TypedDict, total=False):
     verdict: CriticVerdict | None
     iterations: int
     final_response: str | None
+    needs_followup: bool         # NEW
+    followup_questions: list[str] # NEW

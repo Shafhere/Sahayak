@@ -168,6 +168,20 @@ def understand(user_input: str, max_retries: int = 5) -> CitizenProfile:
 
             data = json.loads(raw_json)
             data = _postprocess(data, user_input)
+            
+            # --- NEW MENTOR LOGIC ---
+            # If it's mentor mode and the user didn't provide interests/strengths
+            if data.get("mode") == "mentor":
+                interests = data.get("interests", [])
+                if not interests:
+                    data["needs_followup"] = True
+                    data["followup_questions"] = [
+                        "What subjects do you enjoy the most? (e.g., Math, Science, Arts)",
+                        "What are your strengths? (e.g., problem-solving, creativity, communication)",
+                        "Do you have a specific career or country in mind?"
+                    ]
+                    return CitizenProfile(**data) # Return early to ask questions
+            # ------------------------
 
             try:
                 return CitizenProfile(**data)
@@ -184,8 +198,6 @@ def understand(user_input: str, max_retries: int = 5) -> CitizenProfile:
         except Exception as e:
             print(f"  [Understand] Groq error (attempt {attempt + 1}): {type(e).__name__}")
             last_error = e
-            import time
-            time.sleep(1)
             continue
 
     raise RuntimeError(

@@ -17,8 +17,9 @@ def understand_node(state: SahayakState) -> dict:
         "profile": profile,
         "mode": profile.mode,
         "iterations": 0,
+        "needs_followup": getattr(profile, "needs_followup", False),
+        "followup_questions": getattr(profile, "followup_questions", []),
     }
-
 
 def research_node(state: SahayakState) -> dict:
     """Find grounded chunks with citations."""
