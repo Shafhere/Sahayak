@@ -55,6 +55,8 @@ def clean_text(text: str) -> str:
     # Collapse 3+ newlines into 2
     text = re.sub(r"\n{3,}", "\n\n", text)
 
+    # Normalize unicode whitespace variants (narrow no-break, thin, etc.)
+    text = re.sub(r"[\u00a0\u2000-\u200b\u202f\u205f\u3000]", " ", text)
     # Collapse multiple spaces into 1
     text = re.sub(r"[ \t]+", " ", text)
 

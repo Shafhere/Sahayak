@@ -1,4 +1,3 @@
-
 """Attach source metadata to recommendations using retrieved evidence."""
 
 from app.schemas.citizen import CitizenProfile
@@ -35,6 +34,18 @@ def bind_sources(
         option.source_page = source.page or 0
         option.source_edition = source.edition or ""
 
+        # If the source is NOT a web snippet, but the model claimed the
+        # evidence is web-sourced in eligibility_note, remove that claim.
+        # Web-source wording must only appear on actual web-sourced options.
+        is_web = (source.doc_id or "").startswith("web_")
+        note = option.eligibility_note or ""
+        web_phrase = (
+            "This information came from a web search result; confirm on "
+            "the official portal before applying."
+        )
+        if not is_web and web_phrase in note:
+            option.eligibility_note = note.replace(web_phrase, "").strip()
+
     if profile is not None and profile.mode == "mentor":
         notes = {
             "en": (
@@ -65,10 +76,12 @@ def bind_sources(
             option.eligibility_note = note
             option.benefits = ""
             option.why_relevant = (
-                "This information may help you explore the education or career pathway. "
-                "Confirm your personal eligibility with the official institution."
+                "This information may help you explore the education or "
+                "career pathway. Confirm your personal eligibility with "
+                "the official institution."
             )
-            option.deadline = ""
+            if not option.deadline:
+                option.deadline = ""
 
     # Never infer a monetary benefit from unverified information.
     plan.estimated_annual_benefit = 0

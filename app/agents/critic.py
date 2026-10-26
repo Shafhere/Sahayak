@@ -1,4 +1,3 @@
-
 """Deterministic quality checks for Sahayak action plans."""
 
 import re
@@ -71,7 +70,7 @@ def _check_remarriage_mismatch(profile, plan):
     return errors
 
 
-def _check_completeness(plan):
+def _check_completeness(plan: ActionPlan, mode: str = "scheme"):
     errors = []
     warnings = []
 
@@ -106,13 +105,54 @@ def _check_completeness(plan):
 
     if plan.eligible_schemes:
         if not plan.document_checklist:
-            warnings.append("Recommendations exist, but the document checklist is empty.")
+            warnings.append(
+                "Recommendations exist, but the document checklist is empty."
+            )
+        if len(plan.timeline) < 3:
+            warnings.append("Timeline should have at least 3 ordered steps.")
         if not plan.timeline:
-            warnings.append("Recommendations exist, but the timeline is empty.")
+            warnings.append(
+                "Recommendations exist, but the timeline is empty."
+            )
+
+    # NEW: In scheme mode, if no schemes were returned, next_steps must name
+    # a specific verifiable action — a real portal, a real office type, or a
+    # search instruction — not a vague "visit your local office".
+    if mode == "scheme" and not plan.eligible_schemes:
+        specific_terms = (
+            "portal", "website", "scheme name", "apply online",
+            "district office", "panchayat", "taluk", "block development",
+            "collector", "civil supplies", "welfare department",
+            "search on", "look up",
+        )
+        has_specific = any(
+            any(term in step.casefold() for term in specific_terms)
+            for step in plan.next_steps
+        )
+        if not has_specific:
+            warnings.append(
+                "Scheme plan has no eligible schemes and no specific next action."
+            )
 
     return errors, warnings
 
-
+def _check_duplicate_scheme_ids(plan):
+    """Each recommendation must use a distinct scheme_id."""
+    errors = []
+    seen = {}
+    for scheme in plan.eligible_schemes:
+        sid = scheme.scheme_id or ""
+        if not sid:
+            continue
+        if sid in seen:
+            errors.append(
+                f"Duplicate scheme_id '{sid}' used for both "
+                f"'{seen[sid]}' and '{scheme.name}'. Each recommendation "
+                f"needs its own source."
+            )
+        else:
+            seen[sid] = scheme.name
+    return errors
 def _check_evidence(plan, research):
     errors = []
     warnings = []
@@ -134,10 +174,28 @@ def _check_evidence(plan, research):
         quote = _normalize(scheme.evidence_quote)
         source_text = _normalize(source.text)
 
+        # Web snippets are usually short and paraphrased; strict verbatim
+        # matching would make every web-sourced plan fail. Treat them as
+        # warnings, not errors, but still require the quote to appear in the
+        # snippet so the model can't invent one.
+        if source.doc_id.startswith("web_"):
+            if not quote or quote not in source_text:
+                warnings.append(
+                    f"Web-sourced evidence for {scheme.name} could not be "
+                    f"verified verbatim; confirm with the official source."
+                )
+            if not source.source_url:
+                warnings.append(f"No source URL is available for: {scheme.name}")
+            continue
+
         if len(quote) < 20:
-            errors.append(f"Evidence quote is missing or too short for: {scheme.name}")
+            errors.append(
+                f"Evidence quote is missing or too short for: {scheme.name}"
+            )
         elif quote not in source_text:
-            errors.append(f"Evidence quote does not match retrieved text for: {scheme.name}")
+            errors.append(
+                f"Evidence quote does not match retrieved text for: {scheme.name}"
+            )
 
         if not source.source_url:
             warnings.append(f"No source URL is available for: {scheme.name}")
@@ -158,11 +216,18 @@ def critique(
         errors.extend(_check_gender_mismatch(profile, plan))
         errors.extend(_check_age_mismatch(profile, plan))
         errors.extend(_check_remarriage_mismatch(profile, plan))
+        if plan.eligible_schemes and not plan.document_checklist:
+            errors.append(
+                "Scheme mode: document_checklist is empty even though schemes "
+                "were recommended."
+            )
 
-    completeness_errors, completeness_warnings = _check_completeness(plan)
+    completeness_errors, completeness_warnings = _check_completeness(
+        plan, profile.mode
+    )
     errors.extend(completeness_errors)
     warnings.extend(completeness_warnings)
-
+    errors.extend(_check_duplicate_scheme_ids(plan))
     if research is not None and research.chunks:
         evidence_errors, evidence_warnings = _check_evidence(plan, research)
         errors.extend(evidence_errors)

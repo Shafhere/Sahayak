@@ -192,7 +192,10 @@ def understand(user_input: str, max_retries: int = 5, requested_mode: str | None
     if requested_mode:
         user_message += "\nSelected mode (preserve this): " + requested_mode
     if followup_answers:
-        user_message += "\nFollow-up questions and citizen answers (JSON): " + json.dumps(followup_answers, ensure_ascii=False)
+        user_message += (
+            "\nFollow-up questions and citizen answers (JSON): "
+            + json.dumps(followup_answers, ensure_ascii=False)
+        )
 
     last_error = None
 
@@ -216,32 +219,19 @@ def understand(user_input: str, max_retries: int = 5, requested_mode: str | None
 
             data = json.loads(raw_json)
             data = _postprocess(data, user_input, followup_answers)
-            
+
             if requested_mode:
                 data["mode"] = requested_mode
-            if data.get("mode") == "mentor":
-                has_direction = bool(data.get("interests") or data.get("strengths") or data.get("career_goal"))
-                data["needs_followup"] = not has_direction and not data.get("user_said_enough", False)
-            if data.get("mode") == "scheme" and data.get("state") and data.get("age") is not None and data.get("life_events"):
-                # Enough context to discover possibilities; unknown eligibility facts remain checks.
-                data["needs_followup"] = False
+
+            # Both modes are single-turn now. Follow-ups are never returned
+            # from the understanding stage. Mentor mode places its
+            # self-assessment questions inside the plan's next_steps instead.
+            data["needs_followup"] = False
+            data["followup_questions"] = []
+
             if data.get("user_said_enough"):
                 data["needs_followup"] = False
-            if data.get("needs_followup") and not data.get("followup_questions"):
-                questions = {
-                    "en": "What subjects or activities do you enjoy, and what would you like to do next?",
-                    "ml": "നിങ്ങൾക്ക് ഇഷ്ടമുള്ള വിഷയങ്ങളോ പ്രവർത്തനങ്ങളോ എന്തൊക്കെയാണ്? ഇനി എന്ത് ചെയ്യാനാണ് ആഗ്രഹം?",
-                    "hi": "आपको कौन से विषय या गतिविधियाँ पसंद हैं, और आगे क्या करना चाहते हैं?",
-                    "ta": "உங்களுக்கு எந்தப் பாடங்கள் அல்லது செயல்பாடுகள் பிடிக்கும்? அடுத்து என்ன செய்ய விரும்புகிறீர்கள்?",
-                }
-                if data.get("mode") == "scheme":
-                    questions = {
-                        "en": "Which state do you live in, and what is the applicant's age?",
-                        "ml": "ഏത് സംസ്ഥാനത്താണ് താമസിക്കുന്നത്? അപേക്ഷകന്റെ പ്രായം എത്രയാണ്?",
-                        "hi": "आप किस राज्य में रहते हैं और आवेदक की उम्र क्या है?",
-                        "ta": "நீங்கள் எந்த மாநிலத்தில் வசிக்கிறீர்கள்? விண்ணப்பதாரரின் வயது என்ன?",
-                    }
-                data["followup_questions"] = [questions.get(data.get("language"), questions["en"])]
+
             if not data.get("needs_followup"):
                 data["followup_questions"] = []
 
@@ -258,10 +248,16 @@ def understand(user_input: str, max_retries: int = 5, requested_mode: str | None
             continue
 
         except RateLimitError as e:
-            raise RuntimeError("The language service is busy or its quota has been reached. Please retry later.") from e
+            raise RuntimeError(
+                "The language service is busy or its quota has been reached. "
+                "Please retry later."
+            ) from e
 
         except Exception as e:
-            print(f"  [Understand] Groq error (attempt {attempt + 1}): {type(e).__name__}: {e}")
+            print(
+                f"  [Understand] Groq error (attempt {attempt + 1}): "
+                f"{type(e).__name__}: {e}"
+            )
             last_error = e
             continue
 

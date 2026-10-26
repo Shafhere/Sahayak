@@ -71,6 +71,7 @@ def _build_query(profile: CitizenProfile) -> str:
             unique.append(p)
     return " ".join(unique)
 
+
 def _source_matches_intent(doc_id: str, query: str) -> bool:
     """Avoid confusing exam bulletins that share school-subject vocabulary.
 
@@ -175,9 +176,10 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
     # Dedupe by document
     chunks = []
     seen_docs = {}
+    max_per_doc = 3 if profile.mode == "scheme" else 2
     for r, adjusted_score in scored:
         doc_id = r.get("doc_id", "")
-        if seen_docs.get(doc_id, 0) >= 2:
+        if seen_docs.get(doc_id, 0) >= max_per_doc:
             continue
         seen_docs[doc_id] = seen_docs.get(doc_id, 0) + 1
 
@@ -195,6 +197,73 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
         if len(chunks) >= top_k:
             break
 
+    # ------------------------------------------------------------------
+    # Fallback: if the KB did not return strong, relevant content, try a
+    # live web search so the citizen gets a starting point instead of an
+    # empty "Let's narrow the search" screen.
+    #
+    # - Mentor mode: fire when fewer than 3 KB chunks were kept.
+    # - Scheme mode: fire when 0 KB chunks were kept OR when every kept
+    #   chunk is only weakly relevant (rerank_score < 1.0). This prevents
+    #   a marginally-matching widow-pension chunk from blocking a real
+    #   web result for an unrelated query (e.g. SC scholarship).
+    # ------------------------------------------------------------------
+    needs_web_fallback = False
+    web_query = ""
+
+    if profile.mode == "mentor" and len(chunks) < 3 and profile.career_goal:
+        needs_web_fallback = True
+        web_query = (
+            f"{profile.career_goal} pathway after "
+            f"{profile.education_level or 'school'} India exams salary"
+        )
+
+    elif profile.mode == "scheme":
+        # "Weak" means below a real relevance threshold, not merely below 1.0
+        # (a widow chunk scoring 0.98 is strong and must NOT trigger web).
+        weak_only = all(c.rerank_score < 0.75 for c in chunks)
+        if len(chunks) == 0 or (weak_only and len(chunks) < 3):
+            needs_web_fallback = True
+            parts = []
+            if profile.retrieval_query:
+                parts.append(profile.retrieval_query)
+            else:
+                parts.append(profile.raw_input)
+            if profile.state:
+                parts.append(profile.state)
+            if profile.category and profile.category != "general":
+                parts.append(profile.category.upper())
+            parts.append("scheme")
+            # Keep the query short (6-8 words). DuckDuckGo returns far better
+            # snippets for focused queries than for full sentences.
+            web_query = " ".join(" ".join(parts).split()[:8])
+
+    if needs_web_fallback and web_query:
+        try:
+            from app.tools.web_search import search as web_search
+            remaining = max(0, top_k - len(chunks))
+            web_results = (
+                web_search(web_query, max_results=min(3, remaining))
+                if remaining else []
+            )
+            for i, r in enumerate(web_results):
+                if not r.get("snippet"):
+                    continue
+                chunks.append(RetrievedChunk(
+                    chunk_id=f"web_{i}",
+                    doc_id=f"web_{i}",
+                    name=r.get("title") or "Web result",
+                    text=r["snippet"],
+                    source_url=r.get("url") or "",
+                    page=0,
+                    edition="",
+                    retrieved_on="",
+                    rerank_score=1.0,
+                    citation=r.get("url") or "",
+                ))
+        except Exception:
+            pass
+
     return ResearchResult(
         query=query,
         mode=profile.mode,
@@ -206,6 +275,7 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
                      "fused_doc_ids": list(dict.fromkeys(c["doc_id"] for c in fused))[:5],
                      "dense_candidates": len(vec_hits), "sparse_candidates": len(bm25_hits),
                      "fused_candidates": len(fused), "kept": len(chunks),
+                     "web_fallback_used": needs_web_fallback,
                      "top_rerank_score": reranked[0].get("_rerank_score") if reranked else None},
     )
 

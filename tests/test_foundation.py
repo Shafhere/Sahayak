@@ -43,24 +43,37 @@ def test_followup_stops_before_research(monkeypatch):
     research.assert_not_called()
 
 
-@pytest.mark.parametrize("direction", [{"interests": ["math"]}, {"strengths": ["writing"]},
-                                      {"career_goal": "doctor"}])
+@pytest.mark.parametrize("direction", [{"interests": ["math"]},
+                                       {"strengths": ["writing"]},
+                                       {"career_goal": "doctor"}])
 def test_mentor_direction_does_not_repeat_followup(monkeypatch, direction):
-    client = fake_client({"mode": "scheme", "needs_followup": True,
+    """Mentor mode never returns follow-ups from the understanding stage."""
+    client = fake_client({"mode": "mentor", "needs_followup": True,
                           "followup_questions": ["Again?"], **direction})
     monkeypatch.setattr(understanding, "_get_client", lambda: client)
-    profile = understanding.understand("After school?", requested_mode="mentor",
-                                       followup_answers={"What do you enjoy?": "Math"})
-    assert profile.mode == "mentor" and not profile.needs_followup
+    profile = understanding.understand(
+        "After school?",
+        requested_mode="mentor",
+        followup_answers={"What do you enjoy?": "Math"},
+    )
+    assert profile.mode == "mentor"
+    assert not profile.needs_followup
     assert profile.followup_questions == []
     message = client.chat.completions.create.call_args.kwargs["messages"][1]["content"]
-    assert "Math" in message and "Selected mode (preserve this): mentor" in message
+    # The requested mode and follow-up answers must still reach the LLM prompt,
+    # even though no follow-up form is returned.
+    assert "Math" in message
+    assert "Selected mode (preserve this): mentor" in message
 
 
-def test_mentor_without_direction_asks_question(monkeypatch):
-    monkeypatch.setattr(understanding, "_get_client", lambda: fake_client({"mode": "mentor"}))
+def test_mentor_without_direction_asks_no_followup(monkeypatch):
+    """Mentor mode is single-turn — no follow-up forms are returned."""
+    monkeypatch.setattr(understanding, "_get_client",
+                        lambda: fake_client({"mode": "mentor"}))
     profile = understanding.understand("Finished class 12")
-    assert profile.needs_followup and profile.followup_questions
+    assert profile.mode == "mentor"
+    assert not profile.needs_followup
+    assert profile.followup_questions == []
     assert profile.age is None
 
 

@@ -1,4 +1,4 @@
-version: "3.1"
+version: "4.0"
 description: "Extracts structured citizen profile, mode, emotion, and follow-up needs."
 
 system: |
@@ -7,91 +7,64 @@ system: |
   Return ONLY a JSON object with these exact keys:
     language, mode, emotion, age, gender, annual_income, state,
     occupation, category, family_size, life_events, missing_fields, raw_input,
-    interests, strengths, career_goal, education_level, subjects, retrieval_query, user_said_enough, needs_followup, followup_questions
+    interests, strengths, career_goal, education_level, subjects, retrieval_query,
+    user_said_enough, needs_followup, followup_questions
 
   MODE — apply in this exact order, first match wins:
     1. "care" — ONLY if the user is clearly expressing loneliness or
-       helplessness WITHOUT asking for a benefit. Triggers:
-         "I feel alone", "nobody cares", "I have no one",
-         "I feel helpless", "I am depressed", "I am sad"
-       DO NOT use "care" just because someone mentions a death.
-       A widow asking about pension is SCHEME mode, not care.
-
-    2. "journey" — travel plans. Triggers:
-         "travel to", "trip to", "visit", "itinerary", "hotel in",
-         "route to", "days in"
-
-    3. "scheme" — asking for a government benefit. Triggers:
-         "pension", "scholarship", "subsidy", "benefit",
-         "financial help", "money for", "government scheme",
-         "widow", "widower", "disability", "old age", "BPL", "ration"
-
-    4. "mentor" — asking for career or education direction. Triggers:
-         "what should I do", "which career", "what to study",
-         "what after 12th", "which course", "how to become"
-
-    5. "companion" — daily life. Triggers: "news", "weather"
-
+       helplessness WITHOUT asking for a benefit.
+    2. "journey" — travel plans.
+    3. "scheme" — asking for a government benefit.
+    4. "mentor" — asking for career or education direction.
+    5. "companion" — daily life.
     6. Default: "scheme"
 
   EMOTION — pick ONE:
-    - "grief" — death, loss, widow, widower, husband died, wife died
-    - "confusion" — don't understand, confused
-    - "hope" — want to, planning, excited
-    - "urgency" — urgent, emergency, immediately
-    - "neutral" — no emotional signal
+    "grief" | "confusion" | "hope" | "urgency" | "neutral"
 
   LANGUAGE:
-    - Malayalam script -> "ml"
-    - Devanagari script -> "hi"
-    - Tamil script -> "ta"
-    - Otherwise -> "en"
+    Malayalam script -> "ml"; Devanagari -> "hi"; Tamil -> "ta"; else "en".
 
-  CATEGORY — lowercase only, one of:
+  CATEGORY — lowercase, one of:
     "general", "obc", "sc", "st", "ews", or null.
-    Never return any other word.
 
-  GENDER — infer from context:
-    widow, mother, grandmother -> "female"
-    widower, father, grandfather -> "male"
+  GENDER — infer from context (widow/mother/grandmother -> female;
+    widower/father/grandfather -> male).
 
-  AGE — extract from numbers near age words.
+  AGE — extract numbers near age words.
 
-  STATE — infer only when clear (city -> state).
+  STATE — infer only when clear.
 
-  LIFE EVENTS — always a list, never null. Empty list if none:
-    spouse_death, child_birth, retirement, job_loss,
-    child_turned_18, education_milestone
+  LIFE EVENTS — always a list; values:
+    spouse_death, child_birth, retirement, job_loss, child_turned_18,
+    education_milestone.
 
   RETRIEVAL QUERY:
-    - Write retrieval_query as one concise English search question describing the citizen's actual need.
-    - Include education level, relevant subjects and career goal from the original message and answers.
-    - Exclude emotional filler, examples inside questions, and details the citizen has not supplied.
-    - Keep language as the citizen's original response language, even though retrieval_query is English.
-    - Extract education_level and subjects from the citizen's own statements.
+    One concise English search question describing the citizen's actual need.
+    Include education level, subjects, and career goal from message + answers.
 
   FOLLOW-UP:
-    - Read the original message AND supplied follow-up answers together.
-    - Do not treat examples in a question as the citizen's answer.
+    - Read the original message AND any supplied follow-up answers together.
     - Preserve the selected mode when provided.
-    - Extract interests and strengths as lists; career_goal as a string or null.
-    - Mentor: ask about direction only if interests, strengths, and career_goal are all absent.
-    - Scheme: ask for missing facts needed to assess the request, such as state and age.
-    - Ask at most three concise questions in the citizen's language.
-    - Set needs_followup to true only when asking questions; otherwise use false and [].
+    - Extract interests and strengths as lists; career_goal as string or null.
+
+    - Scheme mode: ALWAYS set needs_followup=false and followup_questions=[].
+      The request already carries enough signal to search directly.
+
+    - Mentor mode: ALWAYS set needs_followup=false and followup_questions=[].
+      Do not ask follow-ups in the understanding stage. The Planning Agent
+      will include self-assessment questions inside its plan instead.
+
+    - If the user says "that's all", "just help", "proceed", or similar,
+      set user_said_enough=true.
 
   RULES:
     - Extract only what is stated or clearly implied.
-    - Use null for missing scalar fields.
-    - Use [] (empty list) for missing list fields like life_events.
+    - Use null for missing scalar fields; [] for missing list fields.
     - List missing important fields in "missing_fields".
     - Do NOT list a field as missing if it can be inferred.
     - Preserve original text in "raw_input".
-    - If critical fields are missing AND user hasn't said "that's all",
-    - generate a warm follow-up question asking for up to 3 fields at a time.
 
-    - If user says "that's all", "just help", "proceed", or similar,
-    - set user_said_enough=true and list no follow-up questions.
 user: |
   Citizen message: "{raw_input}"
 

@@ -27,7 +27,7 @@ from app.schemas.plan import ActionPlan
 from app.schemas.research import ResearchResult
 
 PROMPT_PATH = ROOT / "app" / "prompts" / "planning" / "v1.yaml"
-MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
+MODEL = os.getenv("GROQ_PLAN_MODEL", os.getenv("GROQ_MODEL", "openai/gpt-oss-20b"))
 
 _prompt_cache = None
 _client_cache = None
@@ -99,6 +99,14 @@ def _build_user_message(
 ) -> str:
     """Build a readable evidence prompt with explicit source IDs."""
     today = datetime.now(ZoneInfo("Asia/Kolkata")).date().isoformat()
+    user_situation_summary = (
+        "User situation summary:\n"
+        f"- Education level: {profile.education_level or 'Not provided'}\n"
+        f"- Interests: {', '.join(profile.interests) or 'Not provided'}\n"
+        f"- Strengths: {', '.join(profile.strengths) or 'Not provided'}\n"
+        f"- Career goal: {profile.career_goal or 'Not provided'}\n"
+        f"- Raw input: {profile.raw_input or 'Not provided'}\n"
+    )
 
     evidence_blocks = []
 
@@ -123,6 +131,7 @@ def _build_user_message(
 
     return (
         f"Today in India: {today}\n\n"
+        f"{user_situation_summary}\n\n"
         f"Citizen profile:\n{profile.model_dump_json(indent=2)}\n\n"
         f"Language: {profile.language}\n\n"
         f"Retrieved evidence:\n{evidence_text}\n\n"
@@ -196,6 +205,24 @@ def plan(
             time.sleep(min(attempt + 1, 3))
 
         except Exception as exc:
+            # Groq's server-side JSON parser sometimes rejects output that is
+            # otherwise valid (e.g. when the model copies Unicode space
+            # variants from source text). Recover the raw generation when
+            # available and validate it ourselves.
+            recovered = False
+            if "json_validate_failed" in str(exc):
+                try:
+                    body = exc.response.json()
+                    raw = body.get("error", {}).get("failed_generation")
+                    if raw:
+                        data = json.loads(raw)
+                        action_plan = ActionPlan.model_validate(data)
+                        return bind_sources(action_plan, research, profile)
+                except Exception as recovery_error:
+                    print(
+                        f"[Plan] Recovery parse failed: "
+                        f"{type(recovery_error).__name__}: {recovery_error}"
+                    )
             last_error = exc
             print(
                 f"[Plan] Groq error on attempt {attempt + 1}/5: "
