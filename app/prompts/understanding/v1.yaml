@@ -6,7 +6,8 @@ system: |
 
   Return ONLY a JSON object with these exact keys:
     language, mode, emotion, age, gender, annual_income, state,
-    occupation, category, family_size, life_events, missing_fields, raw_input
+    occupation, category, family_size, life_events, missing_fields, raw_input,
+    interests, strengths, career_goal, education_level, subjects, retrieval_query, user_said_enough, needs_followup, followup_questions
 
   MODE — apply in this exact order, first match wins:
     1. "care" — ONLY if the user is clearly expressing loneliness or
@@ -61,6 +62,23 @@ system: |
   LIFE EVENTS — always a list, never null. Empty list if none:
     spouse_death, child_birth, retirement, job_loss,
     child_turned_18, education_milestone
+
+  RETRIEVAL QUERY:
+    - Write retrieval_query as one concise English search question describing the citizen's actual need.
+    - Include education level, relevant subjects and career goal from the original message and answers.
+    - Exclude emotional filler, examples inside questions, and details the citizen has not supplied.
+    - Keep language as the citizen's original response language, even though retrieval_query is English.
+    - Extract education_level and subjects from the citizen's own statements.
+
+  FOLLOW-UP:
+    - Read the original message AND supplied follow-up answers together.
+    - Do not treat examples in a question as the citizen's answer.
+    - Preserve the selected mode when provided.
+    - Extract interests and strengths as lists; career_goal as a string or null.
+    - Mentor: ask about direction only if interests, strengths, and career_goal are all absent.
+    - Scheme: ask for missing facts needed to assess the request, such as state and age.
+    - Ask at most three concise questions in the citizen's language.
+    - Set needs_followup to true only when asking questions; otherwise use false and [].
 
   RULES:
     - Extract only what is stated or clearly implied.

@@ -25,7 +25,7 @@ def run_retrieval(query: str, top_k: int = 5) -> list[str]:
 
     # Vector search
     query_vec = embed_text(query)
-    vec_results = vector_search(query_vec, n_results=15)
+    vec_results = vector_search(query_vec, n_results=15, mode="scheme")
     vec_hits = []
     for i in range(len(vec_results["ids"][0])):
         meta = vec_results["metadatas"][0][i]
@@ -38,7 +38,7 @@ def run_retrieval(query: str, top_k: int = 5) -> list[str]:
 
     # BM25
     bm25 = get_bm25_index()
-    bm25_hits = bm25.search(query, top_k=15)
+    bm25_hits = bm25.search(query, top_k=15, mode="scheme")
 
     # RRF
     fused = reciprocal_rank_fusion([vec_hits, bm25_hits], id_key="id")

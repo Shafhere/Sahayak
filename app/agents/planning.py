@@ -1,89 +1,169 @@
-"""Planning Agent — builds action plan from research + profile."""
-import sys
-from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+"""Generate a grounded action plan from retrieved research."""
 
-from langsmith import traceable
 import json
 import os
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
 import yaml
-from groq import Groq
 from dotenv import load_dotenv
+from groq import Groq, RateLimitError
+from langsmith import traceable
 from pydantic import ValidationError
 
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+load_dotenv(ROOT / ".env")
+
+from app.agents.evidence import bind_sources
 from app.schemas.citizen import CitizenProfile
-from app.schemas.research import ResearchResult
 from app.schemas.plan import ActionPlan
+from app.schemas.research import ResearchResult
 
-
-load_dotenv()
-
-PROMPT_PATH = Path("app/prompts/planning/v1.yaml")
+PROMPT_PATH = ROOT / "app" / "prompts" / "planning" / "v1.yaml"
 MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 
-_cached_prompt = None
-_cached_client = None
+_prompt_cache = None
+_client_cache = None
 
 
-def _load_prompt() -> dict:
-    """Load planning prompt once, cache it."""
-    global _cached_prompt
-    if _cached_prompt is None:
-        with open(PROMPT_PATH, "r", encoding="utf-8") as f:
-            _cached_prompt = yaml.safe_load(f)
-    return _cached_prompt
+def _get_prompt():
+    global _prompt_cache
+
+    if _prompt_cache is None:
+        with PROMPT_PATH.open("r", encoding="utf-8") as file:
+            _prompt_cache = yaml.safe_load(file)
+
+    return _prompt_cache
 
 
-def _get_client() -> Groq:
-    """Get or create the singleton Groq client."""
-    global _cached_client
-    if _cached_client is None:
+def _get_client():
+    global _client_cache
+
+    if _client_cache is None:
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
-            raise RuntimeError("GROQ_API_KEY not set")
-        _cached_client = Groq(api_key=api_key, timeout=30.0, max_retries=2)
-    return _cached_client
+            raise RuntimeError("GROQ_API_KEY is missing from your .env file.")
 
-@traceable(run_type="chain", name="3. Planning Agent")
-def plan(profile: CitizenProfile, research: ResearchResult, max_chunks: int = 5) -> ActionPlan:
-    """
-    Build an action plan from the citizen profile and research chunks.
-    """
-    if not research or not research.chunks:
-        return ActionPlan(
-            eligible_schemes=[],
-            document_checklist=[],
-            timeline=[],
-            next_steps=[
-                "No information found for your query. "
-                "Please provide more details or visit your local panchayat office."
-            ],
-            estimated_annual_benefit=0,
+        _client_cache = Groq(
+            api_key=api_key,
+            timeout=30.0,
+            max_retries=1,
         )
 
-    prompt = _load_prompt()
-    client = _get_client()
+    return _client_cache
 
-    chunk_text = "\n\n---\n\n".join([
-        f"[Source: {c.name}]\n{c.text}"
-        for c in research.chunks[:max_chunks]
-    ])
 
-    user_message = prompt["user"].format(
-        profile=profile.model_dump_json(indent=2),
-        language=profile.language,
-        research=chunk_text,
+def _fallback_plan(profile: CitizenProfile) -> ActionPlan:
+    greetings = {
+        "en": (
+            "I can help identify relevant options, but more verified "
+            "information is needed before recommending schemes."
+        ),
+        "ml": (
+            "അനുയോജ്യമായ ഓപ്ഷനുകൾ കണ്ടെത്താൻ ഞാൻ സഹായിക്കാം. "
+            "പദ്ധതികൾ ശുപാർശ ചെയ്യാൻ കൂടുതൽ സ്ഥിരീകരിച്ച വിവരങ്ങൾ ആവശ്യമാണ്."
+        ),
+        "hi": (
+            "मैं उपयुक्त विकल्प खोजने में मदद कर सकता हूँ। "
+            "योजनाओं की सिफारिश के लिए अधिक सत्यापित जानकारी आवश्यक है।"
+        ),
+        "ta": (
+            "பொருத்தமான விருப்பங்களைக் கண்டறிய உதவ முடியும். "
+            "திட்டங்களைப் பரிந்துரைக்க மேலும் சரிபார்க்கப்பட்ட தகவல்கள் தேவை."
+        ),
+    }
+
+    return ActionPlan(
+        greeting=greetings.get(profile.language, greetings["en"]),
+        eligible_schemes=[],
+        document_checklist=[],
+        timeline=[],
+        next_steps=[
+            "Check the relevant official government portal or local government office for verified information."
+        ],
+        estimated_annual_benefit=0,
     )
 
-    # Retry logic for Groq JSON failures
+
+def _build_user_message(
+    profile: CitizenProfile,
+    research: ResearchResult,
+    max_chunks: int,
+) -> str:
+    """Build a readable evidence prompt with explicit source IDs."""
+    today = datetime.now(ZoneInfo("Asia/Kolkata")).date().isoformat()
+
+    evidence_blocks = []
+
+    for chunk in research.chunks[:max_chunks]:
+        source_id = chunk.chunk_id or chunk.doc_id or "unknown"
+
+        evidence_blocks.append(
+            f"Source ID: {source_id}\n"
+            f"Document ID: {chunk.doc_id or ''}\n"
+            f"Name: {chunk.name or ''}\n"
+            f"Page: {chunk.page}\n"
+            f"Edition: {chunk.edition or ''}\n"
+            f"Source URL: {chunk.source_url or ''}\n"
+            f"Evidence text:\n{chunk.text}"
+        )
+
+    evidence_text = (
+        "\n\n---\n\n".join(evidence_blocks)
+        if evidence_blocks
+        else "No retrieved evidence available."
+    )
+
+    return (
+        f"Today in India: {today}\n\n"
+        f"Citizen profile:\n{profile.model_dump_json(indent=2)}\n\n"
+        f"Language: {profile.language}\n\n"
+        f"Retrieved evidence:\n{evidence_text}\n\n"
+        "Create an action plan using only the supplied evidence. "
+        "For each recommendation, copy its exact Source ID into scheme_id. "
+        "Evidence quotes must be verbatim text from the matching source. "
+        "Do not invent eligibility, benefits, deadlines, or contact details. "
+        "Return one valid JSON object matching the ActionPlan structure. "
+        "Do not include Markdown fences or explanatory text."
+    )
+
+
+@traceable(name="sahayak_plan")
+def plan(
+    profile: CitizenProfile,
+    research: ResearchResult,
+    max_chunks: int = 5,
+) -> ActionPlan:
+    """Generate, validate, and ground an action plan."""
+    if research is None or not research.chunks:
+        return _fallback_plan(profile)
+
+    prompt = _get_prompt()
+    client = _get_client()
+
+    system_prompt = (
+        prompt["system"]
+        + "\n\nReturn only one valid JSON object. Follow the ActionPlan "
+        "structure. Use empty strings, empty lists, or zero where "
+        "information is unavailable. Never invent evidence."
+    )
+
+    user_message = _build_user_message(profile, research, max_chunks)
     last_error = None
+
     for attempt in range(5):
         try:
             response = client.chat.completions.create(
                 model=MODEL,
                 messages=[
-                    {"role": "system", "content": prompt["system"]},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_message},
                 ],
                 temperature=0.2,
@@ -93,46 +173,61 @@ def plan(profile: CitizenProfile, research: ResearchResult, max_chunks: int = 5)
             raw_json = response.choices[0].message.content
 
             if not raw_json or not raw_json.strip():
-                print(f"  [Plan] Empty response (attempt {attempt + 1}) — retrying")
+                last_error = ValueError("Groq returned an empty response.")
+                time.sleep(min(attempt + 1, 3))
                 continue
 
             data = json.loads(raw_json)
+            action_plan = ActionPlan.model_validate(data)
 
-            try:
-                return ActionPlan(**data)
-            except ValidationError as e:
-                print(f"  [Plan] Schema validation failed (attempt {attempt + 1}): {e}")
-                last_error = e
-                continue
+            return bind_sources(action_plan, research, profile)
 
-        except json.JSONDecodeError as e:
-            print(f"  [Plan] Invalid JSON (attempt {attempt + 1}): {e}")
-            last_error = e
-            continue
+        except RateLimitError as exc:
+            raise RuntimeError(
+                "Groq rate limit reached while generating the action plan. "
+                "Please retry later."
+            ) from exc
 
-        except Exception as e:
-            print(f"  [Plan] Groq error (attempt {attempt + 1}): {type(e).__name__}")
-            last_error = e
-            import time
-            time.sleep(1)
-            continue
+        except (json.JSONDecodeError, ValidationError, ValueError) as exc:
+            last_error = exc
+            print(
+                f"[Plan] Invalid response on attempt {attempt + 1}/5: {exc}"
+            )
+            time.sleep(min(attempt + 1, 3))
+
+        except Exception as exc:
+            last_error = exc
+            print(
+                f"[Plan] Groq error on attempt {attempt + 1}/5: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            time.sleep(min(attempt + 1, 3))
 
     raise RuntimeError(
-        f"Planning failed after 3 attempts. Last error: {last_error}"
-    )
+        f"Failed to generate a valid action plan after 5 attempts. "
+        f"Last error: {last_error}"
+    ) from last_error
 
 
 if __name__ == "__main__":
-    from app.agents.understanding import understand
-    from app.agents.research import research
+    profile = CitizenProfile(
+        language="en",
+        mode="scheme",
+        raw_input="My grandmother is 68, widowed, lives in Kerala, and has no income.",
+        age=68,
+        gender="female",
+        state="Kerala",
+        occupation="Not specified",
+        retrieval_query="Kerala elderly widow pension schemes eligibility",
+        life_events=["widow"],
+    )
 
-    sample = "My grandmother is 68, widow, lives in Kerala, no income"
-    profile = understand(sample)
-    research_result = research(profile)
-    action_plan = plan(profile, research_result)
+    research_result = ResearchResult(
+        query="Kerala elderly widow pension schemes",
+        mode="scheme",
+        chunks=[],
+        num_results=0,
+        source="rag",
+    )
 
-    print(f"\nProfile mode: {profile.mode}")
-    print(f"Research source: {research_result.source}")
-    print(f"Research chunks: {research_result.num_results}")
-    print(f"\nAction Plan:")
-    print(action_plan.model_dump_json(indent=2))
+    print(plan(profile, research_result).model_dump_json(indent=2))

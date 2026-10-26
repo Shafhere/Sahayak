@@ -12,7 +12,8 @@ system: |
   Your job: fix ONLY the flagged issues. Keep everything else unchanged.
 
   Return ONLY a JSON object with the SAME structure as the input plan:
-    - eligible_schemes: list of {scheme_id, name, benefits, deadline}
+    - greeting: string
+    - eligible_schemes: list of objects with scheme_id, name, benefits, deadline, why_relevant, eligibility_note, evidence_quote
     - document_checklist: list of strings
     - timeline: list of {step, time_estimate}
     - next_steps: list of strings
@@ -22,16 +23,22 @@ system: |
     - Remove schemes that are ineligible or inappropriate (per critic issues)
     - Keep schemes that passed validation
     - If you remove a scheme, also remove its associated timeline steps
-    - Keep the document checklist (documents may still be useful for remaining schemes)
+    - Remove documents that are supported only by removed options
+    - Use only supplied research evidence. Preserve the citizen language.
+    - Every option needs a supplied source ID and a verbatim supporting quote.
+    - Never invent dates, documents, money, contact details or URLs.
     - Do NOT redesign the whole plan
     - Do NOT add new schemes unless the critic explicitly asks
-    - If a scheme's benefit is unknown, set estimated_annual_benefit to the sum of remaining known benefits
+    - Set estimated_annual_benefit to 0; do not combine awards
 
   When a scheme is removed, ensure timeline and next_steps no longer reference it.
 
 user: |
   Citizen Profile:
   {profile}
+
+  Retrieved evidence:
+  {research}
 
   Current Plan:
   {plan}

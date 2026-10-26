@@ -1,0 +1,530 @@
+{
+  "description": "Four synthetic end-to-end smoke tests; passing validates flow and citation presence, not every factual claim or native-language quality.",
+  "results": [
+    {
+      "id": "mentor_en",
+      "seconds": 7.65,
+      "language": "en",
+      "followup": false,
+      "questions": [],
+      "retrieval_query": "What are the steps to become a doctor after completing 12th with biology, chemistry, and physics?",
+      "research": {
+        "diagnostics": {
+          "dense_doc_ids": [
+            "cbse_compendium_2026",
+            "nta_neet_2026",
+            "ncert_counselling",
+            "nta_jee_2026"
+          ],
+          "sparse_doc_ids": [
+            "nta_neet_2026",
+            "cbse_compendium_2026",
+            "nta_jee_2026",
+            "ncert_counselling"
+          ],
+          "fused_doc_ids": [
+            "nta_neet_2026",
+            "cbse_compendium_2026",
+            "ncert_counselling"
+          ],
+          "dense_candidates": 25,
+          "sparse_candidates": 25,
+          "fused_candidates": 41,
+          "kept": 2,
+          "top_rerank_score": 3.2426939010620117
+        },
+        "query": "What are the steps to become a doctor after completing 12th with biology, chemistry, and physics?",
+        "mode": "mentor",
+        "chunks": [
+          {
+            "chunk_id": "nta_neet_2026__chunk_78",
+            "page": 31,
+            "edition": "2026 admission cycle; dates may have passed",
+            "retrieved_on": "2026-10-21",
+            "doc_id": "nta_neet_2026",
+            "name": "NEET UG Information Bulletin 2026",
+            "text": "condary Examination after a period of 12 years of study, the study of the requisite subjects i.e. Physics, Chemistry, Biology / Biotechnology along with English even as additional subjects after passing Class 12th from duly recognized boards by the concerned Govt. (which shall include practical tests in these subjects) and Mathematics or any other elective subject with English at a level not less than the core course for English as prescribed by the National Council of Educational Research and Training after the introduction of the 10+2+3 educational structure as recommended by the National Committee on Education. Public Notice dated 22.11.2023 (Para-7), consequent to the introduction of NEP and various legal issues, further adds that: The National Medical Commission in its meeting held on 14.06.2023 after detailed deliberations while taking into consideration the NEP, which permits great extent of flexibility in the study of various subjects in Class 12th, decided that the previous approach of the erstwhile Medical Council of India needs to be",
+            "rerank_score": 3.2426939010620117,
+            "source_url": "https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/202602231394640855.pdf",
+            "citation": "NEET UG Information Bulletin 2026 — https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/202602231394640855.pdf"
+          },
+          {
+            "chunk_id": "nta_neet_2026__chunk_77",
+            "page": 31,
+            "edition": "2026 admission cycle; dates may have passed",
+            "retrieved_on": "2026-10-21",
+            "doc_id": "nta_neet_2026",
+            "name": "NEET UG Information Bulletin 2026",
+            "text": "ination criteria. CODE: 01 A candidate who is appearing in the qualifying examination, whose 12th result is awaited, may apply and appear in the test but he/she shall not be eligible for admission to the Undergraduate Medical Courses if he/she does not pass the qualifying examination at the time of first round of Counseling. Candidates who have undertaken study of the requisite subjects i.e. Physics, Chemistry, Biology / Biotechnology along with English even as additional subjects after passing Class 12th from duly recognized boards by the concerned Govt. such candidates shall be permitted to appear in NEET-UG Test and resultantly also be eligible for grant of Eligibility Certifi cate as per Public Notice dated 22.11.2023. However, their candidature will be considered only if they provide documentary evidence of having passed the qualifying Examination with the required subjects. OR CODE: 02 The Higher/Senior Secondary Examination or the Indian School Certificate Examination which is equivalent to class 12 Higher/Senior Secondary Examination after a period of 12 years of study, the study of the requisite subjects i.e. Physics, Chemistry, Biology / Biotechnology along with English",
+            "rerank_score": 1.3006856441497803,
+            "source_url": "https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/202602231394640855.pdf",
+            "citation": "NEET UG Information Bulletin 2026 — https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/202602231394640855.pdf"
+          }
+        ],
+        "num_results": 2,
+        "source": "rag"
+      },
+      "plan": {
+        "greeting": "I understand you’re feeling uncertain about the next steps to become a doctor after 12th. Let’s outline a clear plan for you.",
+        "eligible_schemes": [
+          {
+            "scheme_id": "nta_neet_2026__chunk_77",
+            "name": "NEET‑UG Eligibility and Application",
+            "benefits": "",
+            "deadline": "",
+            "why_relevant": "This pathway appeared in the search for your interests and career direction. Compare its course content with what you want to study.",
+            "eligibility_note": "Confirm the required subjects, marks, entrance tests and current admission cycle with the institution. This source does not establish your eligibility.",
+            "evidence_quote": "Candidates who have undertaken study of the requisite subjects i.e. Physics, Chemistry, Biology / Biotechnology along with English even as additional subjects after passing Class 12th from duly recognized boards by the concerned Govt.",
+            "source_url": "https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/202602231394640855.pdf",
+            "source_name": "NEET UG Information Bulletin 2026",
+            "source_page": 31,
+            "source_edition": "2026 admission cycle; dates may have passed"
+          }
+        ],
+        "document_checklist": [],
+        "timeline": [
+          {
+            "step": "Verify 12th result and confirm required subjects",
+            "time_estimate": ""
+          },
+          {
+            "step": "Register for NEET‑UG online",
+            "time_estimate": ""
+          },
+          {
+            "step": "Begin NEET preparation (study material, coaching, practice tests)",
+            "time_estimate": ""
+          },
+          {
+            "step": "Take NEET exam and await results",
+            "time_estimate": ""
+          },
+          {
+            "step": "Apply for counseling and submit eligibility certificate",
+            "time_estimate": ""
+          }
+        ],
+        "next_steps": [
+          "Check your 12th result to confirm you have studied Physics, Chemistry, Biology/Biotechnology, and English",
+          "Register for NEET‑UG through the official online portal",
+          "Start a structured NEET study plan, including mock tests and revision",
+          "Gather any required documents for counseling once NEET results are out"
+        ],
+        "estimated_annual_benefit": 0
+      },
+      "verdict": {
+        "passed": true,
+        "errors": [],
+        "warnings": [
+          "Schemes listed but no document checklist provided (user may not know what to bring)"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "scheme_ml",
+      "seconds": 27.64,
+      "language": "ml",
+      "followup": false,
+      "questions": [],
+      "retrieval_query": "What are the eligibility criteria for widow pension in Kerala for a 68-year-old woman with no income?",
+      "research": {
+        "diagnostics": {
+          "dense_doc_ids": [
+            "sevana_widow_criteria",
+            "sevana_old_age_criteria",
+            "pm_kisan_guidelines",
+            "pmay_urban_2",
+            "kasp_kbf"
+          ],
+          "sparse_doc_ids": [
+            "sevana_widow_criteria",
+            "sevana_old_age_criteria",
+            "pmay_urban_2",
+            "pm_kisan_guidelines",
+            "pm_yasasvi_guidelines"
+          ],
+          "fused_doc_ids": [
+            "sevana_widow_criteria",
+            "sevana_old_age_criteria",
+            "pm_kisan_guidelines",
+            "pmay_urban_2",
+            "kasp_kbf"
+          ],
+          "dense_candidates": 25,
+          "sparse_candidates": 25,
+          "fused_candidates": 43,
+          "kept": 4,
+          "top_rerank_score": 6.615038871765137
+        },
+        "query": "What are the eligibility criteria for widow pension in Kerala for a 68-year-old woman with no income?",
+        "mode": "scheme",
+        "chunks": [
+          {
+            "chunk_id": "sevana_widow_criteria__chunk_0",
+            "page": 0,
+            "edition": "Portal criteria; verify latest government orders",
+            "retrieved_on": "2026-10-21",
+            "doc_id": "sevana_widow_criteria",
+            "name": "Kerala widow pension criteria",
+            "text": "Criteria for Allotting Indira Gandhi National Widow Pension Scheme 1. The annual family income of the applicant should not exceed Rs. 1 lakh 2. Applicant should be a widow/whose husband has been missing for an extended more than 7 Years/ Women over 50 years of age who have been deserted for more than 7 years and have not remarried 3. Applicant should not be a service pensioner / family pensioner.(Ex-gratia family pension/NPS of up to Rs.4000 is excluded.) 4. Applicant should not be a remarried person. 5. The applicant should not be an income tax payer 6. Recipients of any other social welfare pension can not apply.(Maximum of two pension including EPF) except Disabled pension 7. The applicant/family should not own more than two acres. ( Scheduled tribe is excluded ) 8. No person shall be eligible for the pension, if the person applied for any Social Welfare pensions. 9. Applicant should not own/in family non-taxi, four or more wheeled vehicles (except Ambassador car) with engine capacity of more than 1000 cc 10. The applicant should not be under the protection of anyone else 11. Applicant should not be a recipient of salary / pension / family pension from Central Government /",
+            "rerank_score": 11.615038871765137,
+            "source_url": "https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=6",
+            "citation": "Kerala widow pension criteria — https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=6"
+          },
+          {
+            "chunk_id": "sevana_widow_criteria__chunk_1",
+            "page": 0,
+            "edition": "Portal criteria; verify latest government orders",
+            "retrieved_on": "2026-10-21",
+            "doc_id": "sevana_widow_criteria",
+            "name": "Kerala widow pension criteria",
+            "text": "plicant should not be under the protection of anyone else 11. Applicant should not be a recipient of salary / pension / family pension from Central Government / other State Governments. 12. No person shall be eligible if he/she resorts to habitual begging. 13. Applicant should not be a retiree from Central / State Public Sector Undertakings and a recipient of Pension / Family Pension 14. Applicant is not eligible if the person is admitted to a poor home. 15. Applicant should not be an applicant /Benificiery of two different local bodies 16. Can apply to the local body of permanent residence 17. Permanently residing within the Kerala State for a continuous period of not less than 2 years. 18. No Age limit 19. Applicant must be a destitute. 20. Applicant not be the owner / resident of the building more than 2000 Sq Ft",
+            "rerank_score": 10.509507656097412,
+            "source_url": "https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=6",
+            "citation": "Kerala widow pension criteria — https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=6"
+          },
+          {
+            "chunk_id": "sevana_old_age_criteria__chunk_0",
+            "page": 0,
+            "edition": "Portal criteria; verify latest government orders",
+            "retrieved_on": "2026-10-21",
+            "doc_id": "sevana_old_age_criteria",
+            "name": "Kerala old age pension criteria",
+            "text": "Criteria for Allotting Indira Gandhi National Old Age Pension Scheme 1. The annual family income of the applicant should not exceed Rs. 1 lakh 2. Applicant must be a destitute. 3. Applicant should not be a service pensioner / family pensioner.(Ex-gratia family pension/NPS of up to Rs.4000 is excluded.) 4. The applicant should not be under the protection of anyone else 5. The applicant should not be an income tax payer 6. Recipients of any other social welfare pension can not apply except Disabilty Pension.(Maximum of two pension including EPF) 7. The applicant/family should not own more than two acres. ( Scheduled tribe is excluded ) 8. No person shall be eligible if he/she resorts to habitual begging. 9. Applicant should not own/in family non-taxi, four or more wheeled vehicles (except Ambassador car) with engine capacity of more than 1000 cc 10. No person shall be eligible for the pension, if he/she is admitted to a poor home. 11. Applicant should not be a recipient of salary / pension / family pension from Central Government / other State Governments. 12. Age of 60 years or higher. 13. Applicant should not be a retiree from Central / State Public Sector Undertakings and a",
+            "rerank_score": 9.070125579833984,
+            "source_url": "https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=2",
+            "citation": "Kerala old age pension criteria — https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=2"
+          },
+          {
+            "chunk_id": "sevana_old_age_criteria__chunk_1",
+            "page": 0,
+            "edition": "Portal criteria; verify latest government orders",
+            "retrieved_on": "2026-10-21",
+            "doc_id": "sevana_old_age_criteria",
+            "name": "Kerala old age pension criteria",
+            "text": "Government / other State Governments. 12. Age of 60 years or higher. 13. Applicant should not be a retiree from Central / State Public Sector Undertakings and a recipient of Pension / Family Pension 14. Residing within the Kerala State for a continuous period of not less than three years. 15. Applicant should not be an applicant /Benificiery of two different local bodies 16. Can apply to the local body of permanent residence 17. Applicant not be the owner / resident of the building more than 2000 Sq Ft",
+            "rerank_score": 8.059437274932861,
+            "source_url": "https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=2",
+            "citation": "Kerala old age pension criteria — https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=2"
+          }
+        ],
+        "num_results": 4,
+        "source": "rag"
+      },
+      "plan": {
+        "greeting": "നിങ്ങളുടെ ദുഃഖം ഞങ്ങൾ മനസ്സിലാക്കുന്നു. ഈ പ്രക്രിയയിൽ നിങ്ങളെ സഹായിക്കാൻ ഞങ്ങൾ ഇവിടെ ഉണ്ട്.",
+        "eligible_schemes": [
+          {
+            "scheme_id": "sevana_widow_criteria__chunk_0",
+            "name": "Indira Gandhi National Widow Pension Scheme",
+            "benefits": "",
+            "deadline": "",
+            "why_relevant": "68 വയസ്സുള്ള വിധവ, വരുമാനം ഇല്ല, കേരളത്തിൽ താമസിക്കുന്നു.",
+            "eligibility_note": "Annual family income <= Rs. 1 lakh, destitute, not owning >2 acres, not receiving other pensions, not under protection, not remarried, not a service pensioner, not a recipient of salary/pension from central or state government, not habitual beggar, not admitted to poor home.",
+            "evidence_quote": "The annual family income of the applicant should not exceed Rs. 1 lakh",
+            "source_url": "https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=6",
+            "source_name": "Kerala widow pension criteria",
+            "source_page": 0,
+            "source_edition": "Portal criteria; verify latest government orders"
+          }
+        ],
+        "document_checklist": [],
+        "timeline": [
+          {
+            "step": "ആവശ്യമായ രേഖകൾ ശേഖരിക്കുക",
+            "time_estimate": ""
+          },
+          {
+            "step": "അപേക്ഷാ ഫോം പൂരിപ്പിക്കുക",
+            "time_estimate": ""
+          },
+          {
+            "step": "പ്രാദേശിക പഞ്ചായത്ത് ഓഫീസിൽ അപേക്ഷ സമർപ്പിക്കുക",
+            "time_estimate": ""
+          },
+          {
+            "step": "അപേക്ഷയുടെ നില പരിശോധിക്കുക",
+            "time_estimate": ""
+          }
+        ],
+        "next_steps": [
+          "വിവാഹിതന്റെ മരണ സർട്ടിഫിക്കറ്റ് ശേഖരിക്കുക",
+          "വാർഷിക കുടുംബ വരുമാനം 1 ലക്ഷം രൂപയിൽ താഴെയാണെന്ന് ഉറപ്പാക്കുക",
+          "പ്രാദേശിക പഞ്ചായത്ത് ഓഫീസിൽ അപേക്ഷ സമർപ്പിക്കുക",
+          "അപേക്ഷയുടെ നില പരിശോധിക്കാൻ ബന്ധപ്പെട്ട വകുപ്പുമായി ബന്ധപ്പെടുക"
+        ],
+        "estimated_annual_benefit": 0
+      },
+      "verdict": {
+        "passed": true,
+        "errors": [],
+        "warnings": [
+          "Schemes listed but no document checklist provided (user may not know what to bring)"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "mentor_hi",
+      "seconds": 32.25,
+      "language": "hi",
+      "followup": false,
+      "questions": [],
+      "retrieval_query": "What courses can I pursue after 12th commerce in accounting and business?",
+      "research": {
+        "diagnostics": {
+          "dense_doc_ids": [
+            "cbse_compendium_2026",
+            "ncert_counselling"
+          ],
+          "sparse_doc_ids": [
+            "cbse_compendium_2026",
+            "ncert_counselling",
+            "nta_neet_2026"
+          ],
+          "fused_doc_ids": [
+            "cbse_compendium_2026",
+            "ncert_counselling"
+          ],
+          "dense_candidates": 25,
+          "sparse_candidates": 25,
+          "fused_candidates": 45,
+          "kept": 2,
+          "top_rerank_score": 3.473146438598633
+        },
+        "query": "What courses can I pursue after 12th commerce in accounting and business?",
+        "mode": "mentor",
+        "chunks": [
+          {
+            "chunk_id": "cbse_compendium_2026__chunk_763",
+            "page": 200,
+            "edition": "2026",
+            "retrieved_on": "2026-10-21",
+            "doc_id": "cbse_compendium_2026",
+            "name": "Compendium of Career and Education Pathways — Business administration undergraduate pathways after class 12",
+            "text": "After 12th Some Colleges Bachelor of Business Administration (BBA) BBA (Sales and Marketing) Bachelor of Management Studies (BMS) Bachelor of Business Management (BBM)",
+            "rerank_score": 3.473146438598633,
+            "source_url": "https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf",
+            "citation": "Compendium of Career and Education Pathways — Business administration undergraduate pathways after class 12 — https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf"
+          },
+          {
+            "chunk_id": "cbse_compendium_2026__chunk_530",
+            "page": 200,
+            "edition": "2026",
+            "retrieved_on": "2026-10-21",
+            "doc_id": "cbse_compendium_2026",
+            "name": "Compendium of Career and Education Pathways",
+            "text": "ool (JGBS), Sonipat S P Jain School of Global Management, Mumbai I.K. Gujral Punjab Technical University KK Modi University UPES Dehradun Presidency University, Bangalore United World School of Business, Ahmedabad Xavier School of Commerce, Bhubaneswar University of Madras, Chennai Prestige Institute of Management & Research, Indore Lovely Professional University Dr DY Patil University, Navi Mumbai KIIT School of Management, Bhubaneswar Chandigarh University To help students get started in a career in this field, CBSE has a course titled Business Administration - Business Executive in classes XI and XII. The objectives of the course are: CBSE Subjects & Skill Courses 186 After 12th Some Colleges Bachelor of Business Administration (BBA) BBA (Sales and Marketing) Bachelor of Management Studies (BMS) Bachelor of Business Management (BBM) Education Pathway To provide knowledge of principles, practices, procedures about Business, Trade and Industry To provide basic knowledge of Technological tools including computers and its application in Business To develop an understanding of the environment in which we live and undertake various activities related to business To educate learner in",
+            "rerank_score": 1.6585371494293213,
+            "source_url": "https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf",
+            "citation": "Compendium of Career and Education Pathways — https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf"
+          }
+        ],
+        "num_results": 2,
+        "source": "rag"
+      },
+      "plan": {
+        "greeting": "नमस्ते! आपकी रुचियों के आधार पर कुछ विकल्प सुझा रहा हूँ।",
+        "eligible_schemes": [
+          {
+            "scheme_id": "cbse_compendium_2026__chunk_763",
+            "name": "Bachelor of Business Administration (BBA)",
+            "benefits": "",
+            "deadline": "",
+            "why_relevant": "आपकी रुचियों और करियर की दिशा से जुड़ी खोज में यह विकल्प मिला। इसके पाठ्यक्रम की तुलना अपनी सीखने की इच्छा से करें।",
+            "eligibility_note": "संस्थान से आवश्यक विषय, अंक, प्रवेश परीक्षा और वर्तमान प्रवेश सत्र की पुष्टि करें। यह स्रोत आपकी पात्रता तय नहीं करता।",
+            "evidence_quote": "After 12th Some Colleges Bachelor of Business Administration (BBA) BBA (Sales and Marketing) Bachelor of Management Studies (BMS) Bachelor of Business Management (BBM)",
+            "source_url": "https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf",
+            "source_name": "Compendium of Career and Education Pathways — Business administration undergraduate pathways after class 12",
+            "source_page": 200,
+            "source_edition": "2026"
+          },
+          {
+            "scheme_id": "cbse_compendium_2026__chunk_530",
+            "name": "Bachelor of Management Studies (BMS)",
+            "benefits": "",
+            "deadline": "",
+            "why_relevant": "आपकी रुचियों और करियर की दिशा से जुड़ी खोज में यह विकल्प मिला। इसके पाठ्यक्रम की तुलना अपनी सीखने की इच्छा से करें।",
+            "eligibility_note": "संस्थान से आवश्यक विषय, अंक, प्रवेश परीक्षा और वर्तमान प्रवेश सत्र की पुष्टि करें। यह स्रोत आपकी पात्रता तय नहीं करता।",
+            "evidence_quote": "After 12th Some Colleges Bachelor of Business Administration (BBA) BBA (Sales and Marketing) Bachelor of Management Studies (BMS) Bachelor of Business Management (BBM)",
+            "source_url": "https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf",
+            "source_name": "Compendium of Career and Education Pathways",
+            "source_page": 200,
+            "source_edition": "2026"
+          },
+          {
+            "scheme_id": "cbse_compendium_2026__chunk_530",
+            "name": "Bachelor of Business Management (BBM)",
+            "benefits": "",
+            "deadline": "",
+            "why_relevant": "आपकी रुचियों और करियर की दिशा से जुड़ी खोज में यह विकल्प मिला। इसके पाठ्यक्रम की तुलना अपनी सीखने की इच्छा से करें।",
+            "eligibility_note": "संस्थान से आवश्यक विषय, अंक, प्रवेश परीक्षा और वर्तमान प्रवेश सत्र की पुष्टि करें। यह स्रोत आपकी पात्रता तय नहीं करता।",
+            "evidence_quote": "After 12th Some Colleges Bachelor of Business Administration (BBA) BBA (Sales and Marketing) Bachelor of Management Studies (BMS) Bachelor of Business Management (BBM)",
+            "source_url": "https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf",
+            "source_name": "Compendium of Career and Education Pathways",
+            "source_page": 200,
+            "source_edition": "2026"
+          }
+        ],
+        "document_checklist": [],
+        "timeline": [
+          {
+            "step": "सभी संभावित कॉलेजों और पाठ्यक्रमों की सूची बनाएं",
+            "time_estimate": ""
+          },
+          {
+            "step": "आवश्यक दस्तावेज़ एकत्रित करें",
+            "time_estimate": ""
+          },
+          {
+            "step": "आवेदन फॉर्म भरें और जमा करें",
+            "time_estimate": ""
+          }
+        ],
+        "next_steps": [
+          "कॉलेजों की सूची बनाएं",
+          "दस्तावेज़ तैयार करें",
+          "आवेदन करें"
+        ],
+        "estimated_annual_benefit": 0
+      },
+      "verdict": {
+        "passed": true,
+        "errors": [],
+        "warnings": [
+          "Schemes listed but no document checklist provided (user may not know what to bring)"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "mentor_ta",
+      "seconds": 6.59,
+      "language": "ta",
+      "followup": false,
+      "questions": [],
+      "retrieval_query": "What engineering courses are suitable for a student who has completed 12th with interest in math and physics?",
+      "research": {
+        "diagnostics": {
+          "dense_doc_ids": [
+            "cbse_compendium_2026",
+            "nta_neet_2026",
+            "nta_jee_2026"
+          ],
+          "sparse_doc_ids": [
+            "ncert_counselling",
+            "nta_neet_2026",
+            "cbse_compendium_2026",
+            "nta_jee_2026"
+          ],
+          "fused_doc_ids": [
+            "cbse_compendium_2026",
+            "ncert_counselling",
+            "nta_jee_2026"
+          ],
+          "dense_candidates": 25,
+          "sparse_candidates": 25,
+          "fused_candidates": 41,
+          "kept": 2,
+          "top_rerank_score": -0.17391906678676605
+        },
+        "query": "What engineering courses are suitable for a student who has completed 12th with interest in math and physics?",
+        "mode": "mentor",
+        "chunks": [
+          {
+            "chunk_id": "cbse_compendium_2026__chunk_92",
+            "page": 39,
+            "edition": "2026",
+            "retrieved_on": "2026-10-21",
+            "doc_id": "cbse_compendium_2026",
+            "name": "Compendium of Career and Education Pathways",
+            "text": "nak Dev University College, Verka, Dist- Amritsar Kumaun University, Mallital, Nanital Iawar Saran Degree College, University of Allahabad 1) To be eligible for a B.Voc (Automotive) program, you typically need to have completed your 10+2 (12th standard) or equivalent from a recognized board, in any stream. Some universities may require a minimum percentage in the 12th standard, often around 50%. Additionally, some programs may have specific subject requirements or even a merit-based admission process. 2) To be eligible for a B.Voc(Automobile) you typically need to have passed your 10+2 (or equivalent) from a recognized board with a minimum aggregate of 50%. Some programs may also require specific subjects like Physics, Chemistry, and Mathematics. Additionally, some institutions may offer lateral entry for students with 2 years of ITI after 10th or a Polytechnic Diploma.",
+            "rerank_score": -0.17391906678676605,
+            "source_url": "https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf",
+            "citation": "Compendium of Career and Education Pathways — https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf"
+          },
+          {
+            "chunk_id": "cbse_compendium_2026__chunk_759",
+            "page": 124,
+            "edition": "2026",
+            "retrieved_on": "2026-10-21",
+            "doc_id": "cbse_compendium_2026",
+            "name": "Compendium of Career and Education Pathways — Engineering education pathways after class 12",
+            "text": "Education Pathway After 12th Some Colleges Diploma in Electrical Engineering B.Tech (Electrical Engineering)",
+            "rerank_score": -0.4293796718120575,
+            "source_url": "https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf",
+            "citation": "Compendium of Career and Education Pathways — Engineering education pathways after class 12 — https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf"
+          }
+        ],
+        "num_results": 2,
+        "source": "rag"
+      },
+      "plan": {
+        "greeting": "வணக்கம்! உங்கள் பொறியியல் ஆர்வத்திற்கு உதவ தயாராக உள்ளேன்.",
+        "eligible_schemes": [
+          {
+            "scheme_id": "cbse_compendium_2026__chunk_92",
+            "name": "B.Voc (Automotive)",
+            "benefits": "",
+            "deadline": "",
+            "why_relevant": "உங்கள் ஆர்வங்கள் மற்றும் தொழில் நோக்கத்தின் அடிப்படையிலான தேடலில் இந்தப் பாதை கிடைத்தது. நீங்கள் கற்க விரும்புவதுடன் அதன் பாடத்திட்டத்தை ஒப்பிடுங்கள்.",
+            "eligibility_note": "தேவையான பாடங்கள், மதிப்பெண்கள், நுழைவுத் தேர்வுகள் மற்றும் தற்போதைய சேர்க்கைக் காலத்தை நிறுவனத்திடம் உறுதிப்படுத்துங்கள். இந்த ஆதாரம் உங்கள் தகுதியை உறுதிசெய்யாது.",
+            "evidence_quote": "To be eligible for a B.Voc (Automotive) program, you typically need to have completed your 10+2 (12th standard) or equivalent from a recognized board, in any stream.",
+            "source_url": "https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf",
+            "source_name": "Compendium of Career and Education Pathways",
+            "source_page": 39,
+            "source_edition": "2026"
+          },
+          {
+            "scheme_id": "cbse_compendium_2026__chunk_759",
+            "name": "Diploma in Electrical Engineering / B.Tech (Electrical Engineering)",
+            "benefits": "",
+            "deadline": "",
+            "why_relevant": "உங்கள் ஆர்வங்கள் மற்றும் தொழில் நோக்கத்தின் அடிப்படையிலான தேடலில் இந்தப் பாதை கிடைத்தது. நீங்கள் கற்க விரும்புவதுடன் அதன் பாடத்திட்டத்தை ஒப்பிடுங்கள்.",
+            "eligibility_note": "தேவையான பாடங்கள், மதிப்பெண்கள், நுழைவுத் தேர்வுகள் மற்றும் தற்போதைய சேர்க்கைக் காலத்தை நிறுவனத்திடம் உறுதிப்படுத்துங்கள். இந்த ஆதாரம் உங்கள் தகுதியை உறுதிசெய்யாது.",
+            "evidence_quote": "Education Pathway After 12th Some Colleges Diploma in Electrical Engineering B.Tech (Electrical Engineering)",
+            "source_url": "https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf",
+            "source_name": "Compendium of Career and Education Pathways — Engineering education pathways after class 12",
+            "source_page": 124,
+            "source_edition": "2026"
+          }
+        ],
+        "document_checklist": [],
+        "timeline": [
+          {
+            "step": "பல்கலைக்கழகங்கள் மற்றும் பாடநெறிகளை ஆராயுங்கள்",
+            "time_estimate": ""
+          },
+          {
+            "step": "தகுதி நிபந்தனைகளை சரிபார்க்கவும்",
+            "time_estimate": ""
+          },
+          {
+            "step": "ஆவணங்களைத் தயாரிக்கவும்",
+            "time_estimate": ""
+          },
+          {
+            "step": "விண்ணப்பத்தை சமர்ப்பிக்கவும்",
+            "time_estimate": ""
+          }
+        ],
+        "next_steps": [
+          "பல்கலைக்கழக வலைத்தளங்களில் B.Voc மற்றும் Diploma பாடநெறிகளைப் பார்க்கவும்",
+          "12ஆம் வகுப்பு மதிப்பெண் சான்றிதழ் மற்றும் அடையாள ஆவணங்களைச் சேகரிக்கவும்",
+          "குறைந்தபட்ச சதவீதம் மற்றும் பாடப்பிரிவு தேவைகளை உறுதிப்படுத்தவும்",
+          "விண்ணப்பப் படிவங்களை நிரப்பி சமர்ப்பிக்கவும்"
+        ],
+        "estimated_annual_benefit": 0
+      },
+      "verdict": {
+        "passed": true,
+        "errors": [],
+        "warnings": [
+          "Schemes listed but no document checklist provided (user may not know what to bring)"
+        ]
+      },
+      "passed": true
+    }
+  ]
+}

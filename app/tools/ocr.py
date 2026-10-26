@@ -1,40 +1,27 @@
-"""OCR using Groq Llama 3.2 Vision."""
-import os
-import base64
-from groq import Groq
-from dotenv import load_dotenv
+"""Local OCR for printed English images. Images are not sent to an AI provider."""
+from functools import lru_cache
+from io import BytesIO
+import numpy as np
+from PIL import Image, UnidentifiedImageError
 
-load_dotenv()
+@lru_cache(maxsize=1)
+def _engine():
+    from rapidocr_onnxruntime import RapidOCR
+    return RapidOCR(intra_op_num_threads=2, inter_op_num_threads=2)
 
 def extract_text_from_image(image_bytes: bytes) -> str:
-    """Use Groq Vision to read an image and extract text."""
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
-        return "Error: GROQ_API_KEY not found."
-        
-    client = Groq(api_key=api_key)
-    
-    # Convert image to base64
-    base64_image = base64.b64encode(image_bytes).decode('utf-8')
-    
+    if not image_bytes or len(image_bytes) > 10 * 1024 * 1024:
+        return "OCR Error: Choose an image smaller than 10 MB."
     try:
-        response = client.chat.completions.create(
-            model="llama-3.2-11b-vision-preview",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": "Extract all text from this document. If it is an income certificate, find the name and annual income. If it is an ID, find the name and age. Return plain text."},
-                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
-                    ]
-                }
-            ],
-            temperature=0.1,
-            max_tokens=1024,
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"OCR Error: {e}"
-
-if __name__ == "__main__":
-    print("OCR tool ready.")
+        with Image.open(BytesIO(image_bytes)) as source:
+            if source.width * source.height > 20_000_000:
+                return "OCR Error: Choose an image below 20 megapixels."
+            image = source.convert("RGB")
+            image.thumbnail((2400, 2400))
+            result, _ = _engine()(np.array(image))
+        lines = [row[1] for row in (result or []) if row[2] >= .6]
+        return "\n".join(lines) or "OCR Error: No clear printed text found. Try a sharper English document image."
+    except (UnidentifiedImageError, OSError, ValueError):
+        return "OCR Error: This image could not be read. Try a PNG or JPEG."
+    except Exception:
+        return "OCR Error: The local reader is unavailable. Check the OCR installation."

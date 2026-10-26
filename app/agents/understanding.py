@@ -9,7 +9,7 @@ import json
 import os
 import re
 import yaml
-from groq import Groq
+from groq import Groq, RateLimitError
 from dotenv import load_dotenv
 from pydantic import ValidationError
 
@@ -18,17 +18,17 @@ from app.schemas.citizen import CitizenProfile
 
 load_dotenv()
 
-PROMPT_PATH = Path("app/prompts/understanding/v1.yaml")
+PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts/understanding/v1.yaml"
 MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 
 VALID_CATEGORIES = {"general", "obc", "sc", "st", "ews"}
 
 GENDER_KEYWORDS = {
+    "widower": "male",
     "widow": "female",
     "വിധവ": "female",
     "विधवा": "female",
     "விதவை": "female",
-    "widower": "male",
     "mother": "female",
     "അമ്മ": "female",
     "grandmother": "female",
@@ -52,7 +52,6 @@ AGE_PATTERNS = [
     r"(\d+)\s*(?:വയസ്സ്|വയസ്)",
     r"(\d+)\s*(?:साल|वर्ष)",
     r"(\d+)\s*(?:வயது)",
-    r"\b(\d{2})\b",
 ]
 
 _cached_prompt = None
@@ -75,11 +74,15 @@ def _get_client() -> Groq:
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             raise RuntimeError("GROQ_API_KEY not set")
-        _cached_client = Groq(api_key=api_key, timeout=30.0, max_retries=2)
+        _cached_client = Groq(api_key=api_key, timeout=30.0, max_retries=1)
     return _cached_client
 
 
-def _postprocess(data: dict, raw_input: str) -> dict:
+def _postprocess(
+    data: dict,
+    raw_input: str,
+    followup_answers: dict[str, str] | None = None,
+) -> dict:
     """Fix common LLM mistakes using deterministic rules."""
     # 0. Fix None values for list fields
     if data.get("life_events") is None:
@@ -103,15 +106,54 @@ def _postprocess(data: dict, raw_input: str) -> dict:
                 data["gender"] = gender
                 break
 
-    # 3. Age: regex extraction if missing
-    if not data.get("age"):
+    # 3. Age: extract from the original message and follow-up answers
+    if data.get("age") is None:
+        followup_text = " ".join(
+            f"{question}: {answer}"
+            for question, answer in (followup_answers or {}).items()
+            if isinstance(question, str) and isinstance(answer, str)
+        )
+        age_text = f"{raw_input}\n{followup_text}"
+
         for pattern in AGE_PATTERNS:
-            match = re.search(pattern, raw_input, re.IGNORECASE)
+            match = re.search(pattern, age_text, re.IGNORECASE)
             if match:
                 age = int(match.group(1))
                 if 1 <= age <= 120:
                     data["age"] = age
                     break
+
+    
+    # 3b. State: recover a state explicitly given in follow-up answers
+    if not data.get("state"):
+        followup_text = " ".join(
+            answer
+            for answer in (followup_answers or {}).values()
+            if isinstance(answer, str)
+        ).strip()
+
+        known_states = [
+            "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar",
+            "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh",
+            "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh",
+            "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
+            "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
+            "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand",
+            "West Bengal", "Andaman and Nicobar Islands", "Chandigarh",
+            "Dadra and Nagar Haveli and Daman and Diu", "Delhi",
+            "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry",
+        ]
+
+        for state in known_states:
+            if re.search(
+                rf"(?<!\w){re.escape(state)}(?!\w)",
+                followup_text,
+                re.IGNORECASE,
+            ):
+                data["state"] = state
+                break
+
+
 
     # 4. Emotion: detect grief from keywords if LLM said neutral
     if data.get("emotion") == "neutral":
@@ -140,11 +182,17 @@ def _postprocess(data: dict, raw_input: str) -> dict:
     return data
 
 @traceable(run_type="chain", name="1. Understanding Agent")
-def understand(user_input: str, max_retries: int = 5) -> CitizenProfile:
+def understand(user_input: str, max_retries: int = 5, requested_mode: str | None = None,
+               followup_answers: dict[str, str] | None = None) -> CitizenProfile:
     """Read a citizen's message and return a structured CitizenProfile."""
     prompt = _load_prompt()
     client = _get_client()
     user_message = prompt["user"].format(raw_input=user_input)
+
+    if requested_mode:
+        user_message += "\nSelected mode (preserve this): " + requested_mode
+    if followup_answers:
+        user_message += "\nFollow-up questions and citizen answers (JSON): " + json.dumps(followup_answers, ensure_ascii=False)
 
     last_error = None
 
@@ -167,21 +215,35 @@ def understand(user_input: str, max_retries: int = 5) -> CitizenProfile:
                 continue
 
             data = json.loads(raw_json)
-            data = _postprocess(data, user_input)
+            data = _postprocess(data, user_input, followup_answers)
             
-            # --- NEW MENTOR LOGIC ---
-            # If it's mentor mode and the user didn't provide interests/strengths
+            if requested_mode:
+                data["mode"] = requested_mode
             if data.get("mode") == "mentor":
-                interests = data.get("interests", [])
-                if not interests:
-                    data["needs_followup"] = True
-                    data["followup_questions"] = [
-                        "What subjects do you enjoy the most? (e.g., Math, Science, Arts)",
-                        "What are your strengths? (e.g., problem-solving, creativity, communication)",
-                        "Do you have a specific career or country in mind?"
-                    ]
-                    return CitizenProfile(**data) # Return early to ask questions
-            # ------------------------
+                has_direction = bool(data.get("interests") or data.get("strengths") or data.get("career_goal"))
+                data["needs_followup"] = not has_direction and not data.get("user_said_enough", False)
+            if data.get("mode") == "scheme" and data.get("state") and data.get("age") is not None and data.get("life_events"):
+                # Enough context to discover possibilities; unknown eligibility facts remain checks.
+                data["needs_followup"] = False
+            if data.get("user_said_enough"):
+                data["needs_followup"] = False
+            if data.get("needs_followup") and not data.get("followup_questions"):
+                questions = {
+                    "en": "What subjects or activities do you enjoy, and what would you like to do next?",
+                    "ml": "നിങ്ങൾക്ക് ഇഷ്ടമുള്ള വിഷയങ്ങളോ പ്രവർത്തനങ്ങളോ എന്തൊക്കെയാണ്? ഇനി എന്ത് ചെയ്യാനാണ് ആഗ്രഹം?",
+                    "hi": "आपको कौन से विषय या गतिविधियाँ पसंद हैं, और आगे क्या करना चाहते हैं?",
+                    "ta": "உங்களுக்கு எந்தப் பாடங்கள் அல்லது செயல்பாடுகள் பிடிக்கும்? அடுத்து என்ன செய்ய விரும்புகிறீர்கள்?",
+                }
+                if data.get("mode") == "scheme":
+                    questions = {
+                        "en": "Which state do you live in, and what is the applicant's age?",
+                        "ml": "ഏത് സംസ്ഥാനത്താണ് താമസിക്കുന്നത്? അപേക്ഷകന്റെ പ്രായം എത്രയാണ്?",
+                        "hi": "आप किस राज्य में रहते हैं और आवेदक की उम्र क्या है?",
+                        "ta": "நீங்கள் எந்த மாநிலத்தில் வசிக்கிறீர்கள்? விண்ணப்பதாரரின் வயது என்ன?",
+                    }
+                data["followup_questions"] = [questions.get(data.get("language"), questions["en"])]
+            if not data.get("needs_followup"):
+                data["followup_questions"] = []
 
             try:
                 return CitizenProfile(**data)
@@ -195,8 +257,11 @@ def understand(user_input: str, max_retries: int = 5) -> CitizenProfile:
             last_error = e
             continue
 
+        except RateLimitError as e:
+            raise RuntimeError("The language service is busy or its quota has been reached. Please retry later.") from e
+
         except Exception as e:
-            print(f"  [Understand] Groq error (attempt {attempt + 1}): {type(e).__name__}")
+            print(f"  [Understand] Groq error (attempt {attempt + 1}): {type(e).__name__}: {e}")
             last_error = e
             continue
 

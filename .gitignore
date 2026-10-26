@@ -42,3 +42,5 @@ logs/
 !data/raw/COLLECTION_LOG.md
 
 .cache/
+data/eval/runtime_metrics.jsonl
+

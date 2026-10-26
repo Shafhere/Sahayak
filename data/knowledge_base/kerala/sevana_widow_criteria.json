@@ -1,0 +1,25 @@
+{
+  "doc_id": "sevana_widow_criteria",
+  "source_file": "data/raw/kerala/sevana_widow_criteria.html",
+  "metadata": {
+    "name": "Kerala widow pension criteria",
+    "source_url": "https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=6",
+    "publisher": "Government of Kerala, Sevana",
+    "edition": "Portal criteria; verify latest government orders",
+    "retrieved_on": "2026-10-21",
+    "sha256": "f1a786dd304a600cc49cc6b6246dee0aaa465a6d1d8455d792dbfbfd47f6c0a7",
+    "state": "kerala",
+    "active": true,
+    "extraction_version": 2
+  },
+  "chunks": [
+    "Criteria for Allotting Indira Gandhi National Widow Pension Scheme 1. The annual family income of the applicant should not exceed Rs. 1 lakh 2. Applicant should be a widow/whose husband has been missing for an extended more than 7 Years/ Women over 50 years of age who have been deserted for more than 7 years and have not remarried 3. Applicant should not be a service pensioner / family pensioner.(Ex-gratia family pension/NPS of up to Rs.4000 is excluded.) 4. Applicant should not be a remarried person. 5. The applicant should not be an income tax payer 6. Recipients of any other social welfare pension can not apply.(Maximum of two pension including EPF) except Disabled pension 7. The applicant/family should not own more than two acres. ( Scheduled tribe is excluded ) 8. No person shall be eligible for the pension, if the person applied for any Social Welfare pensions. 9. Applicant should not own/in family non-taxi, four or more wheeled vehicles (except Ambassador car) with engine capacity of more than 1000 cc 10. The applicant should not be under the protection of anyone else 11. Applicant should not be a recipient of salary / pension / family pension from Central Government /",
+    "plicant should not be under the protection of anyone else 11. Applicant should not be a recipient of salary / pension / family pension from Central Government / other State Governments. 12. No person shall be eligible if he/she resorts to habitual begging. 13. Applicant should not be a retiree from Central / State Public Sector Undertakings and a recipient of Pension / Family Pension 14. Applicant is not eligible if the person is admitted to a poor home. 15. Applicant should not be an applicant /Benificiery of two different local bodies 16. Can apply to the local body of permanent residence 17. Permanently residing within the Kerala State for a continuous period of not less than 2 years. 18. No Age limit 19. Applicant must be a destitute. 20. Applicant not be the owner / resident of the building more than 2000 Sq Ft"
+  ],
+  "chunk_pages": [
+    0,
+    0
+  ],
+  "num_chunks": 2,
+  "char_count": 2021
+}

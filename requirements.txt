@@ -12,7 +12,6 @@ pydantic-settings
 sqlalchemy
 psycopg2-binary
 alembic
-xgboost
 scikit-learn
 pandas
 numpy
@@ -22,3 +21,14 @@ pypdf
 streamlit
 plotly
 pytest
+# Direct dependencies used by the agents and UI
+groq
+langsmith
+requests
+
+fonttools
+bcrypt
+PyJWT
+email-validator
+rapidocr_onnxruntime
+Pillow

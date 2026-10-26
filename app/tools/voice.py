@@ -7,11 +7,13 @@ load_dotenv()
 
 def transcribe_audio(audio_bytes: bytes, filename: str = "audio.wav") -> str:
     """Transcribe audio using Groq's Whisper model."""
+    if not audio_bytes or len(audio_bytes) > 24 * 1024 * 1024:
+        return "Voice Error: Record a shorter message (under 24 MB)."
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         return "Error: GROQ_API_KEY not found."
         
-    client = Groq(api_key=api_key)
+    client = Groq(api_key=api_key, timeout=45, max_retries=1)
     
     try:
         transcription = client.audio.transcriptions.create(
@@ -31,4 +33,4 @@ def transcribe_audio(audio_bytes: bytes, filename: str = "audio.wav") -> str:
             return str(transcription).strip()
             
     except Exception as e:
-        return f"Voice error: {e}"
+        return "Voice Error: Transcription failed. Please retry or type your message."

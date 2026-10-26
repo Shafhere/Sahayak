@@ -1,4 +1,8 @@
 """Embed text using sentence-transformers (local, free)."""
+import os
+import torch
+torch.set_num_threads(int(os.getenv("SAHAYAK_CPU_THREADS", "4")))
+
 from sentence_transformers import SentenceTransformer
 
 # Load model once, reuse forever
@@ -11,7 +15,10 @@ def get_model() -> SentenceTransformer:
     global _model
     if _model is None:
         print(f"Loading embedding model: {MODEL_NAME}")
-        _model = SentenceTransformer(MODEL_NAME)
+        try:
+            _model = SentenceTransformer(MODEL_NAME, local_files_only=True)
+        except OSError:
+            _model = SentenceTransformer(MODEL_NAME)
     return _model
 
 

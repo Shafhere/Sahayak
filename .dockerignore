@@ -1,0 +1,11 @@
+.git
+.env
+.env.*
+venv
+.venv
+__pycache__
+.pytest_cache
+data/raw
+chroma_db
+outputs
+*.zip

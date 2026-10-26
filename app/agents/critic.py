@@ -1,153 +1,175 @@
-"""Critic Agent — validates action plans with pure Python rules. No AI."""
-import sys
-from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+"""Deterministic quality checks for Sahayak action plans."""
 
-from langsmith import traceable
+import re
+
 from app.schemas.citizen import CitizenProfile
 from app.schemas.plan import ActionPlan, CriticVerdict
+from app.schemas.research import ResearchResult
 
 
-# Schemes that are inappropriate for elderly widows
-REMARRIAGE_KEYWORDS = ["remarriage", "mangalya"]
-MATERNITY_KEYWORDS = ["maternity", "mother", "pregnancy", "matru"]
-
-# Schemes that require old age
-OLD_AGE_KEYWORDS = ["old age", "senior citizen", "vayos"]
+def _normalize(text: str) -> str:
+    return re.sub(r"\s+", " ", text or "").strip().casefold()
 
 
-def _check_remarriage_mismatch(profile: CitizenProfile, plan: ActionPlan) -> list[str]:
-    """Elderly widow is seeking pension — remarriage schemes are inappropriate."""
+def _check_gender_mismatch(profile, plan):
     errors = []
-    is_elderly_widow = (
-        profile.life_events and "spouse_death" in profile.life_events
-        and profile.age and profile.age >= 55
-    )
-    if not is_elderly_widow:
-        return errors
 
-    for scheme in plan.eligible_schemes:
-        name_lower = (scheme.name or "").lower()
-        if any(kw in name_lower for kw in REMARRIAGE_KEYWORDS):
-            errors.append(
-                f"Scheme '{scheme.name}' is for remarriage, "
-                f"but user is {profile.age}-year-old widow seeking pension"
-            )
-    return errors
-
-
-def _check_gender_mismatch(profile: CitizenProfile, plan: ActionPlan) -> list[str]:
-    """Male user but scheme is female-only."""
-    errors = []
     if profile.gender != "male":
         return errors
 
+    terms = (
+        "widow pension", "widow scheme", "maternity benefit",
+        "pregnant woman", "pregnant women", "women-only", "women only",
+    )
+
     for scheme in plan.eligible_schemes:
-        name_lower = (scheme.name or "").lower()
-        benefit_lower = (scheme.benefits or "").lower()
-        text = name_lower + " " + benefit_lower
-        if any(kw in text for kw in ["widow", "maternity", "mother", "women"]):
-            errors.append(
-                f"Scheme '{scheme.name}' is female-only, but user is male"
-            )
+        text = _normalize(
+            f"{scheme.name} {scheme.benefits} "
+            f"{scheme.why_relevant} {scheme.eligibility_note}"
+        )
+        if any(term in text for term in terms):
+            errors.append(f"Possible gender mismatch for recommendation: {scheme.name}")
+
     return errors
 
 
-def _check_age_mismatch(profile: CitizenProfile, plan: ActionPlan) -> list[str]:
-    """User under 60 but scheme requires old age."""
+def _check_age_mismatch(profile, plan):
     errors = []
-    if not profile.age or profile.age >= 60:
+
+    if profile.age is None or profile.age >= 60:
+        return errors
+
+    terms = (
+        "old age pension", "senior citizen pension",
+        "senior citizens pension", "vayoshree", "vayovandana",
+    )
+
+    for scheme in plan.eligible_schemes:
+        if any(term in _normalize(scheme.name) for term in terms):
+            errors.append(f"Check age eligibility for recommendation: {scheme.name}")
+
+    return errors
+
+
+def _check_remarriage_mismatch(profile, plan):
+    errors = []
+    events = {str(event).casefold() for event in (profile.life_events or [])}
+
+    if not (
+        {"widow", "widower", "spouse_death"} & events
+    ) or profile.age is None or profile.age < 50:
         return errors
 
     for scheme in plan.eligible_schemes:
-        name_lower = (scheme.name or "").lower()
-        if any(kw in name_lower for kw in OLD_AGE_KEYWORDS):
-            errors.append(
-                f"Scheme '{scheme.name}' requires age 60+, but user is {profile.age}"
-            )
+        text = _normalize(
+            f"{scheme.name} {scheme.benefits} {scheme.eligibility_note}"
+        )
+        if "remarriage" in text and ("widow" in text or "widower" in text):
+            errors.append(f"Verify remarriage-related eligibility: {scheme.name}")
+
     return errors
 
 
-def _check_completeness(plan: ActionPlan) -> tuple[list[str], list[str]]:
-    """Check that plan has all required pieces."""
+def _check_completeness(plan):
     errors = []
     warnings = []
 
-    # Empty plan — no schemes and no useful next steps
     if not plan.eligible_schemes and not plan.next_steps:
-        errors.append("Plan is empty: no schemes found and no next steps")
+        errors.append("The plan has no recommendations and no next steps.")
 
-    # Schemes but no documents
-    if plan.eligible_schemes and not plan.document_checklist:
-        warnings.append(
-            "Schemes listed but no document checklist provided "
-            "(user may not know what to bring)"
-        )
+    # These implementation/schema field names must never appear in
+    # citizen-facing next-step text.
+    internal_names = (
+        "scheme_id",
+        "evidence_quote",
+        "source_page",
+        "retrieved_chunks",
+        "estimated_annual_benefit",
+        "eligible_schemes",
+        "document_checklist",
+        "time_estimate",
+        "source_edition",
+        "source_name",
+    )
 
-    # Schemes but no timeline
-    if plan.eligible_schemes and not plan.timeline:
-        warnings.append("Schemes listed but no timeline provided")
+    for index, step in enumerate(plan.next_steps, start=1):
+        normalized = step.casefold()
 
-    # Schemes but benefit is zero
-    if plan.eligible_schemes and plan.estimated_annual_benefit == 0:
-        warnings.append(
-            "Schemes listed but estimated benefit is Rs 0 "
-            "(amount may not have been extractable from documents)"
-        )
+        if len(step.strip()) < 8:
+            warnings.append(f"Next step {index} may be too vague.")
+
+        if any(name in normalized for name in internal_names):
+            errors.append(
+                f"Next step {index} contains an internal schema field name."
+            )
+
+    if plan.eligible_schemes:
+        if not plan.document_checklist:
+            warnings.append("Recommendations exist, but the document checklist is empty.")
+        if not plan.timeline:
+            warnings.append("Recommendations exist, but the timeline is empty.")
 
     return errors, warnings
 
-@traceable(run_type="chain", name="4. Critic Agent")
-def critique(profile: CitizenProfile, plan: ActionPlan) -> CriticVerdict:
-    """
-    Validate an ActionPlan using deterministic rules.
 
-    Returns:
-        CriticVerdict with passed=False if any errors (triggers replan).
-        passed=True with warnings still shown to user.
-    """
+def _check_evidence(plan, research):
+    errors = []
+    warnings = []
+    sources = {}
+
+    for chunk in research.chunks:
+        if chunk.chunk_id:
+            sources[chunk.chunk_id] = chunk
+        if chunk.doc_id:
+            sources[chunk.doc_id] = chunk
+
+    for scheme in plan.eligible_schemes:
+        source = sources.get(scheme.scheme_id)
+
+        if source is None:
+            errors.append(f"No matching retrieved source for: {scheme.name}")
+            continue
+
+        quote = _normalize(scheme.evidence_quote)
+        source_text = _normalize(source.text)
+
+        if len(quote) < 20:
+            errors.append(f"Evidence quote is missing or too short for: {scheme.name}")
+        elif quote not in source_text:
+            errors.append(f"Evidence quote does not match retrieved text for: {scheme.name}")
+
+        if not source.source_url:
+            warnings.append(f"No source URL is available for: {scheme.name}")
+
+    return errors, warnings
+
+
+def critique(
+    profile: CitizenProfile,
+    plan: ActionPlan,
+    research: ResearchResult | None = None,
+) -> CriticVerdict:
+    """Evaluate plan quality and evidence grounding."""
     errors = []
     warnings = []
 
-    # Rule 1: Context mismatch — remarriage for elderly widow
-    errors.extend(_check_remarriage_mismatch(profile, plan))
+    if profile.mode == "scheme":
+        errors.extend(_check_gender_mismatch(profile, plan))
+        errors.extend(_check_age_mismatch(profile, plan))
+        errors.extend(_check_remarriage_mismatch(profile, plan))
 
-    # Rule 2: Gender mismatch
-    errors.extend(_check_gender_mismatch(profile, plan))
+    completeness_errors, completeness_warnings = _check_completeness(plan)
+    errors.extend(completeness_errors)
+    warnings.extend(completeness_warnings)
 
-    # Rule 3: Age mismatch
-    errors.extend(_check_age_mismatch(profile, plan))
-
-    # Rule 4-7: Completeness
-    comp_errors, comp_warnings = _check_completeness(plan)
-    errors.extend(comp_errors)
-    warnings.extend(comp_warnings)
-
-    passed = len(errors) == 0
+    if research is not None and research.chunks:
+        evidence_errors, evidence_warnings = _check_evidence(plan, research)
+        errors.extend(evidence_errors)
+        warnings.extend(evidence_warnings)
 
     return CriticVerdict(
-        passed=passed,
+        passed=not errors,
         errors=errors,
         warnings=warnings,
     )
-
-
-if __name__ == "__main__":
-    from app.agents.understanding import understand
-    from app.agents.research import research
-    from app.agents.planning import plan as build_plan
-
-    sample = "My grandmother is 68, widow, lives in Kerala, no income"
-    profile = understand(sample)
-    research_result = research(profile)
-    action_plan = build_plan(profile, research_result)
-    verdict = critique(profile, action_plan)
-
-    print(f"\nVerdict: {'PASSED' if verdict.passed else 'FAILED'}")
-    print(f"Errors: {len(verdict.errors)}")
-    for e in verdict.errors:
-        print(f"  - {e}")
-    print(f"Warnings: {len(verdict.warnings)}")
-    for w in verdict.warnings:
-        print(f"  - {w}")

@@ -1,0 +1,706 @@
+{
+  "description": "Small developer-curated smoke set; document hit rate is not factual-answer accuracy or a held-out benchmark.",
+  "passed": 13,
+  "total": 13,
+  "results": [
+    {
+      "id": "doctor",
+      "mode": "mentor",
+      "query": "What courses and entrance examinations lead to becoming a doctor after class 12 with biology?",
+      "expected_any": [
+        "nta_neet_2026",
+        "cbse_compendium_2026"
+      ],
+      "retrieved": [
+        "nta_neet_2026"
+      ],
+      "rank": 1,
+      "passed": true,
+      "seconds": 62.06,
+      "ablations": {
+        "dense_doc_ids": true,
+        "sparse_doc_ids": true,
+        "fused_doc_ids": true
+      },
+      "diagnostics": {
+        "dense_doc_ids": [
+          "nta_neet_2026",
+          "cbse_compendium_2026",
+          "ncert_counselling",
+          "nta_jee_2026"
+        ],
+        "sparse_doc_ids": [
+          "nta_neet_2026",
+          "cbse_compendium_2026",
+          "ncert_counselling"
+        ],
+        "fused_doc_ids": [
+          "nta_neet_2026",
+          "cbse_compendium_2026",
+          "ncert_counselling"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 43,
+        "kept": 2,
+        "top_rerank_score": 1.5570719242095947
+      },
+      "passages": [
+        {
+          "doc_id": "nta_neet_2026",
+          "page": 31,
+          "score": 1.5570719242095947,
+          "text": "condary Examination after a period of 12 years of study, the study of the requisite subjects i.e. Physics, Chemistry, Biology / Biotechnology along with English even as additional subjects after passing Class 12th from duly recognized boards by the concerned Govt. (which shall include practical tests in these subjects) and Mathematics or any other elective subject with English at a level not less than the core course for English as prescribed by the National Council of Educational Research and Training after the introduction of the 10+2+3 educational structure as recommended by the National Committee on Education. Public Notice dated 22.11.2023 (Para-7), consequent to the introduction of NEP and various legal issues, further adds that: The National Medical Commission in its meeting held on 14.06.2023 after detailed deliberations while taking into consideration the NEP, which permits great extent of flexibility in the study of various subjects in Class 12th, decided that the previous approach of the erstwhile Medical Council of India needs to be"
+        },
+        {
+          "doc_id": "nta_neet_2026",
+          "page": 31,
+          "score": 0.43331921100616455,
+          "text": "ination criteria. CODE: 01 A candidate who is appearing in the qualifying examination, whose 12th result is awaited, may apply and appear in the test but he/she shall not be eligible for admission to the Undergraduate Medical Courses if he/she does not pass the qualifying examination at the time of first round of Counseling. Candidates who have undertaken study of the requisite subjects i.e. Physics, Chemistry, Biology / Biotechnology along with English even as additional subjects after passing Class 12th from duly recognized boards by the concerned Govt. such candidates shall be permitted to appear in NEET-UG Test and resultantly also be eligible for grant of Eligibility Certifi cate as per Public Notice dated 22.11.2023. However, their candidature will be considered only if they provide documentary evidence of having passed the qualifying Examination with the required subjects. OR CODE: 02 The Higher/Senior Secondary Examination or the Indian School Certificate Examination which is equivalent to class 12 Higher/Senior Secondary Examination after a period of 12 years of study, the study of the requisite subjects i.e. Physics, Chemistry, Biology / Biotechnology along with English"
+        }
+      ]
+    },
+    {
+      "id": "engineering",
+      "mode": "mentor",
+      "query": "How can I study engineering after class 12 with mathematics and physics?",
+      "expected_any": [
+        "nta_jee_2026",
+        "cbse_compendium_2026"
+      ],
+      "retrieved": [
+        "cbse_compendium_2026"
+      ],
+      "rank": 1,
+      "passed": true,
+      "seconds": 5.42,
+      "ablations": {
+        "dense_doc_ids": true,
+        "sparse_doc_ids": true,
+        "fused_doc_ids": true
+      },
+      "diagnostics": {
+        "dense_doc_ids": [
+          "cbse_compendium_2026",
+          "nta_neet_2026",
+          "nta_jee_2026",
+          "ncert_counselling"
+        ],
+        "sparse_doc_ids": [
+          "nta_neet_2026",
+          "cbse_compendium_2026",
+          "nta_jee_2026",
+          "ncert_counselling"
+        ],
+        "fused_doc_ids": [
+          "cbse_compendium_2026",
+          "nta_jee_2026",
+          "ncert_counselling"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 36,
+        "kept": 1,
+        "top_rerank_score": 0.6458947062492371
+      },
+      "passages": [
+        {
+          "doc_id": "cbse_compendium_2026",
+          "page": 124,
+          "score": 0.6458947062492371,
+          "text": "Education Pathway After 12th Some Colleges Diploma in Electrical Engineering B.Tech (Electrical Engineering)"
+        }
+      ]
+    },
+    {
+      "id": "commerce",
+      "mode": "mentor",
+      "query": "What undergraduate courses and career options are available after class 12 commerce?",
+      "expected_any": [
+        "cbse_compendium_2026"
+      ],
+      "retrieved": [
+        "cbse_compendium_2026"
+      ],
+      "rank": 1,
+      "passed": true,
+      "seconds": 5.76,
+      "ablations": {
+        "dense_doc_ids": true,
+        "sparse_doc_ids": true,
+        "fused_doc_ids": true
+      },
+      "diagnostics": {
+        "dense_doc_ids": [
+          "cbse_compendium_2026",
+          "ncert_counselling"
+        ],
+        "sparse_doc_ids": [
+          "cbse_compendium_2026",
+          "nta_neet_2026",
+          "ncert_counselling"
+        ],
+        "fused_doc_ids": [
+          "cbse_compendium_2026",
+          "ncert_counselling"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 34,
+        "kept": 2,
+        "top_rerank_score": 5.447570323944092
+      },
+      "passages": [
+        {
+          "doc_id": "cbse_compendium_2026",
+          "page": 200,
+          "score": 5.447570323944092,
+          "text": "After 12th Some Colleges Bachelor of Business Administration (BBA) BBA (Sales and Marketing) Bachelor of Management Studies (BMS) Bachelor of Business Management (BBM)"
+        },
+        {
+          "doc_id": "cbse_compendium_2026",
+          "page": 124,
+          "score": 1.355776309967041,
+          "text": "Education Pathway After 12th Some Colleges Diploma in Electrical Engineering B.Tech (Electrical Engineering)"
+        }
+      ]
+    },
+    {
+      "id": "vocational",
+      "mode": "mentor",
+      "query": "What vocational education and skill training pathways are available after class 10?",
+      "expected_any": [
+        "ncert_counselling",
+        "cbse_compendium_2026"
+      ],
+      "retrieved": [
+        "cbse_compendium_2026",
+        "ncert_counselling"
+      ],
+      "rank": 1,
+      "passed": true,
+      "seconds": 8.9,
+      "ablations": {
+        "dense_doc_ids": true,
+        "sparse_doc_ids": true,
+        "fused_doc_ids": true
+      },
+      "diagnostics": {
+        "dense_doc_ids": [
+          "cbse_compendium_2026",
+          "ncert_counselling"
+        ],
+        "sparse_doc_ids": [
+          "cbse_compendium_2026",
+          "ncert_counselling"
+        ],
+        "fused_doc_ids": [
+          "cbse_compendium_2026",
+          "ncert_counselling"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 44,
+        "kept": 4,
+        "top_rerank_score": 2.765892505645752
+      },
+      "passages": [
+        {
+          "doc_id": "cbse_compendium_2026",
+          "page": 5,
+          "score": 2.765892505645752,
+          "text": "Message from Chairperson Education today extends far beyond academic achievement. It must equip learners with practical skills, critical thinking abilities, creativity, and the confidence to navigate real-world challenges. Skill-based education plays a pivotal role in this transformation by enabling students to apply knowledge meaningfully and develop capabilities that are essential for both employment and life. By engaging with skill-based subjects, students gain hands-on experience in areas such as communication, problem-solving, technical competencies, and vocational practices. This not only enhances their readiness for the workplace but also opens up multiple pathways for career progression immediately after school. Importantly, it nurtures a spirit of self-reliance and encourages entrepreneurial thinking—qualities that are vital in today's dynamic and evolving world. In this context, I am pleased to note CBSE's initiative in developing the “Compendium of Career and Education Pathways After Skill Subjects in Class XII.” This resource comes at a crucial juncture when students are making important decisions about their future. It provides clear visibility into a wide spectrum of"
+        },
+        {
+          "doc_id": "cbse_compendium_2026",
+          "page": 6,
+          "score": 2.7547309398651123,
+          "text": "As the landscape of education and employment continues to evolve, the need to align learning with real-world application has become more critical than ever. Skill education is not merely an addition to the academic framework—it is an essential pathway that enables students to translate knowledge into capability and aspiration into opportunity. At CBSE, our focus has been on systematically strengthening this pathway. The introduction of 43 skill subjects at the senior secondary level reflects a conscious effort to provide students with meaningful exposure to diverse domains and emerging industries. These subjects are designed not only to build technical proficiency but also to develop adaptability, problem-solving ability, and a deeper understanding of how different sectors function in practice. The “Compendium of Career and Education Pathways After Skill Subjects in Class XII” is a continuation of this effort. It has been developed as a practical and structured resource to support students at a critical point of transition—from school to higher education and careers. The compendium seeks to bring clarity to the often complex and fragmented information surrounding career options"
+        },
+        {
+          "doc_id": "ncert_counselling",
+          "page": 25,
+          "score": 0.04517487436532974,
+          "text": "VoCational eduCation in neP 2020 and nCF–se 2023 7 1.6.2 Secondary Stage — Grades 9 and 10  Students will be given exposure to six vocations (two from each form of work) spread over two years. These will be equivalent to NSQF Level-1 and 2, where relevant.  Students will learn the relevant skills for these vocations through both workshops conducted in the school, as well as projects and internships at local sites of work. Illustrative Course Design in Secondary Stage – Grades 9 and 10 In the Secondary Stage, there will be six core vocations covering two from each form of work. The illustrative core vocations include agriculture, plumbing, and beauty and wellness in Grade 9, and gardening, carpentry, and nursing and care in Grade 10. These core vocations represent all three forms of work. The design of the course will be as follows: Form of Work Grade 9 Grade 10 Working with Life Forms Agriculture a. Familiarising with and operating basic agricultural equipment. b. Seed bed preparation, seed selection, proper spacing, row cropping, and intercropping c. Fertilisation and soil management. d. Pest and disease identification and control. Gardening a. Gardening tools - Familiarity"
+        },
+        {
+          "doc_id": "ncert_counselling",
+          "page": 26,
+          "score": -0.8770756721496582,
+          "text": "machines, materials, and human services. The framework also differentiates between vocational training and skill training, highlighting the need for systematic, employment-oriented learning. Together, NEP 2020 and NCF- SE 2023 integrates academic knowledge with vocational competencies, thereby narrowing the gap between education and workforce requirements. Chapter 1.indd 8Chapter 1.indd 8 12/10/2025 2:16:41 PM12/10/2025 2:16:41 PM"
+        }
+      ]
+    },
+    {
+      "id": "widow",
+      "mode": "scheme",
+      "query": "What are the eligibility criteria for widow pension in Kerala?",
+      "expected_any": [
+        "sevana_widow_criteria"
+      ],
+      "retrieved": [
+        "sevana_widow_criteria",
+        "sevana_old_age_criteria"
+      ],
+      "rank": 1,
+      "passed": true,
+      "seconds": 8.75,
+      "ablations": {
+        "dense_doc_ids": true,
+        "sparse_doc_ids": true,
+        "fused_doc_ids": true
+      },
+      "diagnostics": {
+        "dense_doc_ids": [
+          "sevana_widow_criteria",
+          "sevana_old_age_criteria",
+          "pm_kisan_guidelines",
+          "pmay_urban_2",
+          "pm_yasasvi_guidelines"
+        ],
+        "sparse_doc_ids": [
+          "sevana_widow_criteria",
+          "sevana_old_age_criteria",
+          "pm_yasasvi_guidelines",
+          "pm_kisan_guidelines",
+          "pmay_urban_2"
+        ],
+        "fused_doc_ids": [
+          "sevana_widow_criteria",
+          "sevana_old_age_criteria",
+          "pm_kisan_guidelines",
+          "pmay_urban_2",
+          "pm_yasasvi_guidelines"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 42,
+        "kept": 4,
+        "top_rerank_score": 8.915861129760742
+      },
+      "passages": [
+        {
+          "doc_id": "sevana_widow_criteria",
+          "page": 0,
+          "score": 13.915861129760742,
+          "text": "Criteria for Allotting Indira Gandhi National Widow Pension Scheme 1. The annual family income of the applicant should not exceed Rs. 1 lakh 2. Applicant should be a widow/whose husband has been missing for an extended more than 7 Years/ Women over 50 years of age who have been deserted for more than 7 years and have not remarried 3. Applicant should not be a service pensioner / family pensioner.(Ex-gratia family pension/NPS of up to Rs.4000 is excluded.) 4. Applicant should not be a remarried person. 5. The applicant should not be an income tax payer 6. Recipients of any other social welfare pension can not apply.(Maximum of two pension including EPF) except Disabled pension 7. The applicant/family should not own more than two acres. ( Scheduled tribe is excluded ) 8. No person shall be eligible for the pension, if the person applied for any Social Welfare pensions. 9. Applicant should not own/in family non-taxi, four or more wheeled vehicles (except Ambassador car) with engine capacity of more than 1000 cc 10. The applicant should not be under the protection of anyone else 11. Applicant should not be a recipient of salary / pension / family pension from Central Government /"
+        },
+        {
+          "doc_id": "sevana_widow_criteria",
+          "page": 0,
+          "score": 13.25650405883789,
+          "text": "plicant should not be under the protection of anyone else 11. Applicant should not be a recipient of salary / pension / family pension from Central Government / other State Governments. 12. No person shall be eligible if he/she resorts to habitual begging. 13. Applicant should not be a retiree from Central / State Public Sector Undertakings and a recipient of Pension / Family Pension 14. Applicant is not eligible if the person is admitted to a poor home. 15. Applicant should not be an applicant /Benificiery of two different local bodies 16. Can apply to the local body of permanent residence 17. Permanently residing within the Kerala State for a continuous period of not less than 2 years. 18. No Age limit 19. Applicant must be a destitute. 20. Applicant not be the owner / resident of the building more than 2000 Sq Ft"
+        },
+        {
+          "doc_id": "sevana_old_age_criteria",
+          "page": 0,
+          "score": 10.383062362670898,
+          "text": "Criteria for Allotting Indira Gandhi National Old Age Pension Scheme 1. The annual family income of the applicant should not exceed Rs. 1 lakh 2. Applicant must be a destitute. 3. Applicant should not be a service pensioner / family pensioner.(Ex-gratia family pension/NPS of up to Rs.4000 is excluded.) 4. The applicant should not be under the protection of anyone else 5. The applicant should not be an income tax payer 6. Recipients of any other social welfare pension can not apply except Disabilty Pension.(Maximum of two pension including EPF) 7. The applicant/family should not own more than two acres. ( Scheduled tribe is excluded ) 8. No person shall be eligible if he/she resorts to habitual begging. 9. Applicant should not own/in family non-taxi, four or more wheeled vehicles (except Ambassador car) with engine capacity of more than 1000 cc 10. No person shall be eligible for the pension, if he/she is admitted to a poor home. 11. Applicant should not be a recipient of salary / pension / family pension from Central Government / other State Governments. 12. Age of 60 years or higher. 13. Applicant should not be a retiree from Central / State Public Sector Undertakings and a"
+        },
+        {
+          "doc_id": "sevana_old_age_criteria",
+          "page": 0,
+          "score": 10.258967876434326,
+          "text": "Government / other State Governments. 12. Age of 60 years or higher. 13. Applicant should not be a retiree from Central / State Public Sector Undertakings and a recipient of Pension / Family Pension 14. Residing within the Kerala State for a continuous period of not less than three years. 15. Applicant should not be an applicant /Benificiery of two different local bodies 16. Can apply to the local body of permanent residence 17. Applicant not be the owner / resident of the building more than 2000 Sq Ft"
+        }
+      ]
+    },
+    {
+      "id": "old_age",
+      "mode": "scheme",
+      "query": "What are the eligibility criteria for old age pension in Kerala?",
+      "expected_any": [
+        "sevana_old_age_criteria"
+      ],
+      "retrieved": [
+        "sevana_old_age_criteria",
+        "sevana_widow_criteria"
+      ],
+      "rank": 1,
+      "passed": true,
+      "seconds": 8.76,
+      "ablations": {
+        "dense_doc_ids": true,
+        "sparse_doc_ids": true,
+        "fused_doc_ids": true
+      },
+      "diagnostics": {
+        "dense_doc_ids": [
+          "sevana_old_age_criteria",
+          "sevana_widow_criteria",
+          "pm_yasasvi_guidelines",
+          "pm_kisan_guidelines",
+          "pmay_urban_2"
+        ],
+        "sparse_doc_ids": [
+          "sevana_old_age_criteria",
+          "sevana_widow_criteria",
+          "pm_yasasvi_guidelines",
+          "pm_kisan_guidelines",
+          "pmay_urban_2"
+        ],
+        "fused_doc_ids": [
+          "sevana_old_age_criteria",
+          "sevana_widow_criteria",
+          "pm_kisan_guidelines",
+          "pmay_urban_2",
+          "pm_yasasvi_guidelines"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 43,
+        "kept": 4,
+        "top_rerank_score": 8.694469451904297
+      },
+      "passages": [
+        {
+          "doc_id": "sevana_old_age_criteria",
+          "page": 0,
+          "score": 13.694469451904297,
+          "text": "Criteria for Allotting Indira Gandhi National Old Age Pension Scheme 1. The annual family income of the applicant should not exceed Rs. 1 lakh 2. Applicant must be a destitute. 3. Applicant should not be a service pensioner / family pensioner.(Ex-gratia family pension/NPS of up to Rs.4000 is excluded.) 4. The applicant should not be under the protection of anyone else 5. The applicant should not be an income tax payer 6. Recipients of any other social welfare pension can not apply except Disabilty Pension.(Maximum of two pension including EPF) 7. The applicant/family should not own more than two acres. ( Scheduled tribe is excluded ) 8. No person shall be eligible if he/she resorts to habitual begging. 9. Applicant should not own/in family non-taxi, four or more wheeled vehicles (except Ambassador car) with engine capacity of more than 1000 cc 10. No person shall be eligible for the pension, if he/she is admitted to a poor home. 11. Applicant should not be a recipient of salary / pension / family pension from Central Government / other State Governments. 12. Age of 60 years or higher. 13. Applicant should not be a retiree from Central / State Public Sector Undertakings and a"
+        },
+        {
+          "doc_id": "sevana_old_age_criteria",
+          "page": 0,
+          "score": 13.546981811523438,
+          "text": "Government / other State Governments. 12. Age of 60 years or higher. 13. Applicant should not be a retiree from Central / State Public Sector Undertakings and a recipient of Pension / Family Pension 14. Residing within the Kerala State for a continuous period of not less than three years. 15. Applicant should not be an applicant /Benificiery of two different local bodies 16. Can apply to the local body of permanent residence 17. Applicant not be the owner / resident of the building more than 2000 Sq Ft"
+        },
+        {
+          "doc_id": "sevana_widow_criteria",
+          "page": 0,
+          "score": 11.162349700927734,
+          "text": "plicant should not be under the protection of anyone else 11. Applicant should not be a recipient of salary / pension / family pension from Central Government / other State Governments. 12. No person shall be eligible if he/she resorts to habitual begging. 13. Applicant should not be a retiree from Central / State Public Sector Undertakings and a recipient of Pension / Family Pension 14. Applicant is not eligible if the person is admitted to a poor home. 15. Applicant should not be an applicant /Benificiery of two different local bodies 16. Can apply to the local body of permanent residence 17. Permanently residing within the Kerala State for a continuous period of not less than 2 years. 18. No Age limit 19. Applicant must be a destitute. 20. Applicant not be the owner / resident of the building more than 2000 Sq Ft"
+        },
+        {
+          "doc_id": "sevana_widow_criteria",
+          "page": 0,
+          "score": 10.775227546691895,
+          "text": "Criteria for Allotting Indira Gandhi National Widow Pension Scheme 1. The annual family income of the applicant should not exceed Rs. 1 lakh 2. Applicant should be a widow/whose husband has been missing for an extended more than 7 Years/ Women over 50 years of age who have been deserted for more than 7 years and have not remarried 3. Applicant should not be a service pensioner / family pensioner.(Ex-gratia family pension/NPS of up to Rs.4000 is excluded.) 4. Applicant should not be a remarried person. 5. The applicant should not be an income tax payer 6. Recipients of any other social welfare pension can not apply.(Maximum of two pension including EPF) except Disabled pension 7. The applicant/family should not own more than two acres. ( Scheduled tribe is excluded ) 8. No person shall be eligible for the pension, if the person applied for any Social Welfare pensions. 9. Applicant should not own/in family non-taxi, four or more wheeled vehicles (except Ambassador car) with engine capacity of more than 1000 cc 10. The applicant should not be under the protection of anyone else 11. Applicant should not be a recipient of salary / pension / family pension from Central Government /"
+        }
+      ]
+    },
+    {
+      "id": "farmer",
+      "mode": "scheme",
+      "query": "Who is eligible for PM KISAN farmer income support?",
+      "expected_any": [
+        "pm_kisan_guidelines"
+      ],
+      "retrieved": [
+        "pm_kisan_guidelines"
+      ],
+      "rank": 1,
+      "passed": true,
+      "seconds": 7.96,
+      "ablations": {
+        "dense_doc_ids": true,
+        "sparse_doc_ids": true,
+        "fused_doc_ids": true
+      },
+      "diagnostics": {
+        "dense_doc_ids": [
+          "pm_kisan_guidelines",
+          "pmay_urban_2"
+        ],
+        "sparse_doc_ids": [
+          "pm_kisan_guidelines",
+          "pm_yasasvi_guidelines",
+          "pmay_urban_2"
+        ],
+        "fused_doc_ids": [
+          "pm_kisan_guidelines",
+          "pmay_urban_2",
+          "pm_yasasvi_guidelines"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 38,
+        "kept": 2,
+        "top_rerank_score": 4.948512077331543
+      },
+      "passages": [
+        {
+          "doc_id": "pm_kisan_guidelines",
+          "page": 2,
+          "score": 4.948512077331543,
+          "text": "2 PRADHAN MANTRI KISAN SAMMAN NIDHI (PM-KISAN) SCHEME OPERATIONAL GUIDELINES (REVISED AS ON 21.6.2019) 1. Scheme With a view to provide income support to all landholding farmers’ families in the country, having cultivable land, the Central Government has implemented a Central Sector Scheme, namely, “Pradhan Mantri KIsan SAmman Nidhi (PM-KISAN)”. 2. Objective and Benefits The scheme aims to supplement the financial needs of all landholding farmers’ families in procuring various inputs to ensure proper crop health and appropriate yields, commensurate with the anticipated farm income as well as for domestic needs. Under the Scheme an amount of Rs.6000/- per year is released by the Central Government online directly into the bank accounts of the eligible farmers under Direct Benefit Transfer mode, subject to certain exclusions. 3. Definition of farmer’s family A landholder farmer’s family is defined as “a family comprising of husband, wife and minor children who own cultivable land as per land records of the concerned State/UT”. The existing land-ownership system will be used for identification of beneficiaries for calculation of benefit. 4 Exclusions 4.1 The following categories of"
+        },
+        {
+          "doc_id": "pm_kisan_guidelines",
+          "page": 5,
+          "score": 4.202505588531494,
+          "text": " holding. This authenticated list of farmers after due verification of succession chart shall be countersigned by the District level revenue authority. Farmers’ names, subject to the exclusion criterion after following the aforementioned process, shall be uploaded on the PM-Kisan portal along with other required details for this disbursement of benefit under the scheme.” 6. Strategy for Implementation 6.1 The States shall prepare database of eligible beneficiary landholder farmer families in the villages capturing the Name, Age, Gender, Category (SC/ST), Aadhaar Number, Bank Account Number and the Mobile Number of the beneficiaries. Responsibility of identifying the landholder farmer family eligible for benefit under the scheme shall be of the State/UT Government. In case of beneficiaries in States of Assam, Meghalaya, J&K where Aadhaar number has not been issued to most of the citizens, Aadhaar number shall be collected for those beneficiaries where it is available and for others alternate prescribed documents such as Driving Licence, Voters’ ID Card,"
+        }
+      ]
+    },
+    {
+      "id": "housing",
+      "mode": "scheme",
+      "query": "What are the eligibility conditions for PMAY Urban 2.0 housing assistance?",
+      "expected_any": [
+        "pmay_urban_2"
+      ],
+      "retrieved": [
+        "pmay_urban_2"
+      ],
+      "rank": 1,
+      "passed": true,
+      "seconds": 4.13,
+      "ablations": {
+        "dense_doc_ids": true,
+        "sparse_doc_ids": true,
+        "fused_doc_ids": true
+      },
+      "diagnostics": {
+        "dense_doc_ids": [
+          "pmay_urban_2"
+        ],
+        "sparse_doc_ids": [
+          "pmay_urban_2"
+        ],
+        "fused_doc_ids": [
+          "pmay_urban_2"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 41,
+        "kept": 2,
+        "top_rerank_score": 6.765450477600098
+      },
+      "passages": [
+        {
+          "doc_id": "pmay_urban_2",
+          "page": 17,
+          "score": 6.765450477600098,
+          "text": "3 Ministry of Housing and Urban Affairs 3. Eligibility Criteria 3.1 Families belonging to EWS/LIG/MIG category, living in urban areas, having no pucca house anywhere in the country, are eligible to purchase or construct a house under PMAY-U 2.0. 3.2 A beneficiary will be eligible for availing benefit under any of the verticals of PMAY-U 2.0 scheme. The beneficiary who has been allotted house under any of the housing scheme of Central Government, State/UT Government and Local Self Government in last 20 years in urban or rural areas, shall not be eligible to seek benefit under PMAY-U 2.0. An undertaking may also be submitted by the beneficiary while validating the demand by ULB in this regard. 3.3 EWS households are defined as households with an annual income of up to ₹3 lakh. LIG is defined as households with an annual income from ₹3 lakh up to ₹6 lakh. MIG is defined as households with an annual income from ₹6 lakh up to ₹9 lakh. States/UTs shall have the flexibility to redefine the annual income criteria of EWS as per prevailing conditions with concurrence of MoHUA. 3.4 Preference under the Scheme will be given to Widows, single women, Persons with Disabilities, Senior Citizens,"
+        },
+        {
+          "doc_id": "pmay_urban_2",
+          "page": 5,
+          "score": 5.438045501708984,
+          "text": "ance to 3 crore additional rural and urban households for the construction of houses, to meet the housing requirements arising out of the increase in the number of eligible families. In the Union Budget 2024, Hon’ble Finance Minister announced that under PMAY-U 2.0, housing needs of 1 crore urban poor and middle-class families will be addressed in the next 5 years. Accordingly, Pradhan Mantri Awas Yojana - Urban 2.0 (PMAY-U 2.0) has been launched to provide assistance to 1 crore eligible urban families, thus ensuring that eligible citizens of urban India lead a better quality of life. The contours of PMAY-U 2.0 have been designed on the basis of learnings of PMAY-U scheme, global best practices/ benchmarks and outcomes of series of consultations with multiple stakeholders including States/UTs, Banks, Housing Finance Companies, Private Sector etc. PMAY-U 2.0 seeks to address the affordable housing requirement in urban areas through following verticals: i. Beneficiary Led Construction (BLC) ii. Affordable Housing in Partnership (AHP) iii. Affordable Rental Housing (ARH) iv. Interest Subsidy Scheme (ISS) i"
+        }
+      ]
+    },
+    {
+      "id": "scholarship",
+      "mode": "scheme",
+      "query": "What post matric scholarships are available for OBC students under PM YASASVI?",
+      "expected_any": [
+        "pm_yasasvi_guidelines"
+      ],
+      "retrieved": [
+        "pm_yasasvi_guidelines"
+      ],
+      "rank": 1,
+      "passed": true,
+      "seconds": 3.3,
+      "ablations": {
+        "dense_doc_ids": true,
+        "sparse_doc_ids": true,
+        "fused_doc_ids": true
+      },
+      "diagnostics": {
+        "dense_doc_ids": [
+          "pm_yasasvi_guidelines",
+          "pmay_urban_2"
+        ],
+        "sparse_doc_ids": [
+          "pm_yasasvi_guidelines"
+        ],
+        "fused_doc_ids": [
+          "pm_yasasvi_guidelines",
+          "pmay_urban_2"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 37,
+        "kept": 2,
+        "top_rerank_score": 6.967802047729492
+      },
+      "passages": [
+        {
+          "doc_id": "pm_yasasvi_guidelines",
+          "page": 12,
+          "score": 6.967802047729492,
+          "text": "12 (B) Centrally Sponsored Scheme of Post-Matric Scholarship for OBC, EBC and DNT Students for studying in India 1. OBJECTIVE The objective of the scheme is to provide financial assistance to the OBC, EBC and DNT students studying at post -matriculation or post-secondary stage to enable them to complete their education. 2. SCOPE These scholarships shall be available for studies in India only and will be awarded by the Government of State/Union Territory to which the applicant actually belongs, i.e. permanently settled. 3. DEFINITIONS a) \" Group 1: Degree and Post Graduate level professional courses\" shall mean: all Professional courses in Medicine, Engineering, Technology, Planning, Architecture , Design, Fashion Technology, Agriculture, Veterinary & Allied Sciences, Management, Business Finance /Administration, Computer Science/ Applications (ii) Post Graduate Diploma courses in various branches of Management & Medicine(iii) C.A./I.C.W.A./C.S./1.C.F.A. etc. (iv) M.Phil., Ph.D. and Post-Doctoral Programmes (D.Lit., D.Sc. etc.) of Group I, Group II and Group Ill courses .(v) L.L.B, Integrated LL B, L.L.M (vi) Commercial Pilot License Courses from GoI institutes (including"
+        },
+        {
+          "doc_id": "pm_yasasvi_guidelines",
+          "page": 33,
+          "score": 6.825657844543457,
+          "text": "e concerned institution, will be eligible for scholarship under the Sc heme to the extent of the number of scholarships (slots) allocated to the institution for the course. (ii) In case the number of eligible students admitted exceeds the number of slots allotted to the institution, the scholarship will be restricted to the top students in the inter-se merit list based on the admission criteria for the course as mentioned in Annexure-II. However, if there is more than one student with equal marks for the last available slot in an institution, preference should be given to the student with the lower family income. The remaining students from OBC/EBC/DNT category admitted in the institution shall be eligible for the Post -Matric Scholarship (PMS) administered by this Ministry through State Governments/UT Administrations, provided such students are otherwise eligible under the saidscheme. (iii) In case the institution finds that the number of eligible candidates in the 1st year are less than the number of slots allotted to it, the balance slots may be offered to eligible students studying in 2nd, 3rd and 4th year, etc. on the basis of inter -se merit of previous year’s result giving"
+        }
+      ]
+    },
+    {
+      "id": "health",
+      "mode": "scheme",
+      "query": "What assistance is available for hospital treatment under KASP in Kerala?",
+      "expected_any": [
+        "kasp_kbf"
+      ],
+      "retrieved": [
+        "kasp_kbf"
+      ],
+      "rank": 1,
+      "passed": true,
+      "seconds": 3.25,
+      "ablations": {
+        "dense_doc_ids": true,
+        "sparse_doc_ids": true,
+        "fused_doc_ids": true
+      },
+      "diagnostics": {
+        "dense_doc_ids": [
+          "kasp_kbf",
+          "pm_yasasvi_guidelines",
+          "sevana_widow_criteria",
+          "pmay_urban_2",
+          "sevana_old_age_criteria"
+        ],
+        "sparse_doc_ids": [
+          "kasp_kbf",
+          "pm_yasasvi_guidelines",
+          "pm_kisan_guidelines",
+          "pmay_urban_2"
+        ],
+        "fused_doc_ids": [
+          "kasp_kbf",
+          "pm_yasasvi_guidelines",
+          "pmay_urban_2",
+          "pm_kisan_guidelines",
+          "sevana_widow_criteria"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 43,
+        "kept": 2,
+        "top_rerank_score": 5.417944431304932
+      },
+      "passages": [
+        {
+          "doc_id": "kasp_kbf",
+          "page": 0,
+          "score": 10.417944431304932,
+          "text": "rnment which provides financial aid for poor people suffering from serious ailments, by raising funds through Kerala lottery. The scheme is managed by the State Lotteries Department (Taxes). Karunya Benevolent Fund is providing financial assistance to under-privileged people suffering from acute ailments like Cancer, Haemophilia, Kidney and Heart diseases and for Palliative Care. The amount for the health scheme is raised through lottery. This welfare measure is helpful to those who suffer from ailments, the cost of treatment of which are proved to be unbearable to lower and even middle strata of society with an annual family income of less than Rs. 3 lakhs. Eligible beneficiary can approach any KASP empaneled hospitals for availing cashless treatment Significant increase in number of health care providers under KBF scheme. Number of treatment packages also increase IT integration enhances patient friendly approaches in KBF schem e"
+        },
+        {
+          "doc_id": "kasp_kbf",
+          "page": 0,
+          "score": 8.517844676971436,
+          "text": "Karunya Arogya Suraksha Padhathi (KASP). From 1st July 2020, the scheme will be implemented directly by Government of Kerala under trust mode (through the newly constituted State Health Agency (SHA)). The claims of Empanelled Health care Providers will be serviced by a TPA/ISA. Current TPA selected through the tender process is Heritage Health Insurance Pvt Ltd. Key Features of KASP – PMJAY • Health care scheme fully financed by the government. • It provides a cover of Rs. 5 lakhs per family per year for secondary and tertiary care hospitalization across public and private empaneled hospitals. • KASP – PMJAY provides cashless access to health care services for the beneficiary at the point of service, that is, the hospital. • KASP – PMJAY envisions to help mitigate catastrophic expenditure on medical treatment. • It covers up to 3 days of pre-hospitalization and 15 days post-hospitalization expenses such as diagnostics and medicines. • There is no restriction on the family size, age or gender. • All pre-existing conditions are covered from day one. • Benefits of the scheme are portable across the country i.e. a beneficiary can visit any empanelled public or private hospital in"
+        }
+      ]
+    },
+    {
+      "id": "unrelated_movies",
+      "mode": "mentor",
+      "query": "Which movies should I watch this weekend?",
+      "expected_any": [],
+      "retrieved": [],
+      "rank": null,
+      "passed": true,
+      "seconds": 3.72,
+      "ablations": {},
+      "diagnostics": {
+        "dense_doc_ids": [
+          "ncert_counselling",
+          "cbse_compendium_2026"
+        ],
+        "sparse_doc_ids": [
+          "ncert_counselling",
+          "cbse_compendium_2026",
+          "nta_neet_2026",
+          "nta_jee_2026"
+        ],
+        "fused_doc_ids": [
+          "ncert_counselling",
+          "cbse_compendium_2026",
+          "nta_neet_2026",
+          "nta_jee_2026"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 48,
+        "kept": 0,
+        "top_rerank_score": -10.736371994018555
+      },
+      "passages": []
+    },
+    {
+      "id": "unrelated_weather",
+      "mode": "mentor",
+      "query": "Will it rain in London tomorrow?",
+      "expected_any": [],
+      "retrieved": [],
+      "rank": null,
+      "passed": true,
+      "seconds": 2.85,
+      "ablations": {},
+      "diagnostics": {
+        "dense_doc_ids": [
+          "nta_neet_2026",
+          "cbse_compendium_2026",
+          "nta_jee_2026",
+          "ncert_counselling"
+        ],
+        "sparse_doc_ids": [
+          "nta_jee_2026",
+          "nta_neet_2026",
+          "ncert_counselling",
+          "cbse_compendium_2026"
+        ],
+        "fused_doc_ids": [
+          "nta_neet_2026",
+          "nta_jee_2026",
+          "cbse_compendium_2026",
+          "ncert_counselling"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 49,
+        "kept": 0,
+        "top_rerank_score": -11.118218421936035
+      },
+      "passages": []
+    },
+    {
+      "id": "unrelated",
+      "mode": "mentor",
+      "query": "How do I bake sourdough bread with rye flour?",
+      "expected_any": [],
+      "retrieved": [],
+      "rank": null,
+      "passed": true,
+      "seconds": 3.64,
+      "ablations": {},
+      "diagnostics": {
+        "dense_doc_ids": [
+          "ncert_counselling",
+          "nta_neet_2026",
+          "nta_jee_2026",
+          "cbse_compendium_2026"
+        ],
+        "sparse_doc_ids": [
+          "ncert_counselling",
+          "nta_jee_2026",
+          "nta_neet_2026",
+          "cbse_compendium_2026"
+        ],
+        "fused_doc_ids": [
+          "nta_neet_2026",
+          "nta_jee_2026",
+          "ncert_counselling",
+          "cbse_compendium_2026"
+        ],
+        "dense_candidates": 25,
+        "sparse_candidates": 25,
+        "fused_candidates": 47,
+        "kept": 0,
+        "top_rerank_score": -10.938468933105469
+      },
+      "passages": []
+    }
+  ]
+}

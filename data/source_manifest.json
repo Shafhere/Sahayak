@@ -1,0 +1,110 @@
+[
+  {
+    "id": "ncert_career_cards_volume1",
+    "folder": "mentor",
+    "name": "NCERT Career Cards Volume 1",
+    "publisher": "NCERT",
+    "url": "https://www.ncert.nic.in/pdf/CareerGuide/Exploring_Career_Cards_Volume1.pdf",
+    "edition": "Career exploration; scanned source requires OCR",
+    "path": "data/raw/mentor/ncert_career_cards_volume1.pdf",
+    "extraction_status": "needs_ocr"
+  },
+  {
+    "id": "ncert_counselling",
+    "folder": "mentor",
+    "name": "Careers in Vocational Education and Entrepreneurship",
+    "publisher": "NCERT PSSCIVE",
+    "url": "https://www.psscive.ac.in/storage/uploads/others/Guidelines/pdf/english/guidelines-for-careers-in-vocational-education-and-entrepreneurship-development-for-school-counselors-english.pdf",
+    "edition": "2025",
+    "path": "data/raw/mentor/ncert_counselling.pdf"
+  },
+  {
+    "id": "nta_neet_2026",
+    "folder": "mentor",
+    "name": "NEET UG Information Bulletin 2026",
+    "publisher": "NTA",
+    "url": "https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/202602231394640855.pdf",
+    "edition": "2026 admission cycle; dates may have passed",
+    "path": "data/raw/mentor/nta_neet_2026.pdf"
+  },
+  {
+    "id": "nta_jee_2026",
+    "folder": "mentor",
+    "name": "JEE Main Information Bulletin 2026",
+    "publisher": "NTA",
+    "url": "https://cdnbbsr.s3waas.gov.in/s3f8e59f4b2fe7c5705bf878bbd494ccdf/uploads/2025/11/202511021649722475.pdf",
+    "edition": "2026 admission cycle; dates may have passed",
+    "path": "data/raw/mentor/nta_jee_2026.pdf"
+  },
+  {
+    "id": "cbse_compendium_2026",
+    "folder": "mentor",
+    "name": "Compendium of Career and Education Pathways",
+    "publisher": "CBSE",
+    "url": "https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf",
+    "edition": "2026",
+    "path": "data/raw/mentor/cbse_compendium_2026.pdf"
+  },
+  {
+    "id": "pmay_urban_2",
+    "folder": "central",
+    "name": "PMAY Urban 2.0 Operational Guidelines",
+    "publisher": "Ministry of Housing and Urban Affairs",
+    "url": "https://pmay-urban.gov.in/uploads/guidelines/Operational-Guidelines-of-PMAY-U-2.pdf",
+    "edition": "2024; verify subsequent amendments",
+    "path": "data/raw/central/pmay_urban_2.pdf"
+  },
+  {
+    "id": "pm_kisan_guidelines",
+    "folder": "central",
+    "name": "PM KISAN Operational Guidelines",
+    "publisher": "Department of Agriculture",
+    "url": "https://www.pmkisan.gov.in/Documents/Revised%20Operational%20Guidelines%20-%20PM-Kisan%20Scheme.pdf",
+    "edition": "2019; verify subsequent amendments",
+    "path": "data/raw/central/pm_kisan_guidelines.pdf"
+  },
+  {
+    "id": "pm_yasasvi_guidelines",
+    "folder": "central",
+    "name": "PM YASASVI Guidelines",
+    "publisher": "Ministry of Social Justice and Empowerment",
+    "url": "https://socialjustice.gov.in/public/ckeditor/upload/65661651839791.pdf",
+    "edition": "Historical guidelines; verify current scholarship cycle",
+    "path": "data/raw/central/pm_yasasvi_guidelines.pdf"
+  },
+  {
+    "id": "sevana_widow_criteria",
+    "folder": "kerala",
+    "name": "Kerala widow pension criteria",
+    "publisher": "Government of Kerala, Sevana",
+    "url": "https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=6",
+    "edition": "Portal criteria; verify latest government orders",
+    "path": "data/raw/kerala/sevana_widow_criteria.html",
+    "format": "html",
+    "state": "kerala"
+  },
+  {
+    "id": "sevana_old_age_criteria",
+    "folder": "kerala",
+    "name": "Kerala old age pension criteria",
+    "publisher": "Government of Kerala, Sevana",
+    "url": "https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=2",
+    "edition": "Portal criteria; verify latest government orders",
+    "path": "data/raw/kerala/sevana_old_age_criteria.html",
+    "format": "html",
+    "state": "kerala"
+  },
+  {
+    "id": "kasp_kbf",
+    "folder": "kerala",
+    "name": "KASP and Karunya Benevolent Fund",
+    "publisher": "State Health Agency Kerala",
+    "url": "https://sha.kerala.gov.in/?page_id=110&lang=en",
+    "edition": "Portal reference retrieved October 2026; confirm current eligibility",
+    "path": "data/raw/kerala/kasp_kbf.html",
+    "format": "html",
+    "state": "kerala",
+    "section_start": "Karunya Arogya Suraksha Padhathi (KASP)",
+    "section_end": "Click here for more details"
+  }
+]

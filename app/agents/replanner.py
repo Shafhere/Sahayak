@@ -1,155 +1,177 @@
-"""Replanner Agent — fixes only the parts of a plan that the Critic flagged."""
-import sys
-from pathlib import Path
-from langsmith import traceable
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+"""Revise an action plan using critic feedback and retrieved evidence."""
 
 import json
 import os
+import sys
+import time
+from pathlib import Path
+
 import yaml
-from groq import Groq
 from dotenv import load_dotenv
+from groq import Groq, RateLimitError
 from pydantic import ValidationError
+from langsmith import traceable
 
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
+load_dotenv(ROOT / ".env")
+
+from app.agents.evidence import bind_sources
 from app.schemas.citizen import CitizenProfile
 from app.schemas.plan import ActionPlan
+from app.schemas.research import ResearchResult
 
-
-load_dotenv()
-
-PROMPT_PATH = Path("app/prompts/replanner/v1.yaml")
+PROMPT_PATH = ROOT / "app" / "prompts" / "replanner" / "v1.yaml"
 MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 
-_cached_prompt = None
-_cached_client = None
+_prompt_cache = None
+_client_cache = None
 
 
-def _load_prompt() -> dict:
-    """Load replanner prompt once, cache it."""
-    global _cached_prompt
-    if _cached_prompt is None:
-        with open(PROMPT_PATH, "r", encoding="utf-8") as f:
-            _cached_prompt = yaml.safe_load(f)
-    return _cached_prompt
+def _get_prompt():
+    """Load and cache the replanning prompt."""
+    global _prompt_cache
+
+    if _prompt_cache is None:
+        with PROMPT_PATH.open("r", encoding="utf-8") as file:
+            _prompt_cache = yaml.safe_load(file)
+
+    return _prompt_cache
 
 
-def _get_client() -> Groq:
-    """Get or create the singleton Groq client."""
-    global _cached_client
-    if _cached_client is None:
+def _get_client():
+    """Create and cache the Groq client."""
+    global _client_cache
+
+    if _client_cache is None:
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
-            raise RuntimeError("GROQ_API_KEY not set")
-        _cached_client = Groq(api_key=api_key, timeout=30.0, max_retries=2)
-    return _cached_client
+            raise RuntimeError(
+                "GROQ_API_KEY is missing. Add it to your .env file."
+            )
+        _client_cache = Groq(api_key=api_key)
 
-@traceable(run_type="chain", name="5. Replanner Agent")
+    return _client_cache
+
+
+def _build_user_message(
+    profile: CitizenProfile,
+    plan: ActionPlan,
+    issues: list[str],
+    research: ResearchResult | None,
+) -> str:
+    """Build the replanning request with available evidence."""
+    evidence = []
+
+    if research and research.chunks:
+        for chunk in research.chunks:
+            evidence.append(
+                {
+                    "chunk_id": chunk.chunk_id,
+                    "doc_id": chunk.doc_id,
+                    "name": chunk.name,
+                    "page": chunk.page,
+                    "source_url": chunk.source_url,
+                    "text": chunk.text,
+                }
+            )
+
+    return (
+        f"Citizen profile:\n{profile.model_dump_json(indent=2)}\n\n"
+        f"Current action plan:\n{plan.model_dump_json(indent=2)}\n\n"
+        f"Critic issues to fix:\n{json.dumps(issues, ensure_ascii=False)}\n\n"
+        f"Retrieved evidence:\n"
+        f"{json.dumps(evidence, ensure_ascii=False, indent=2)}\n\n"
+        "Return one valid JSON object matching the ActionPlan structure. "
+        "Fix the listed issues without inventing facts or evidence. "
+        "If the evidence does not support a scheme, remove it rather than "
+        "making unsupported claims. Preserve useful correct information."
+    )
+
+
+@traceable(name="sahayak_replan")
 def replan(
     profile: CitizenProfile,
     plan: ActionPlan,
     issues: list[str],
-    max_retries: int = 5,
+    max_retries: int = 3,
+    research: ResearchResult | None = None,
 ) -> ActionPlan:
-    """
-    Fix only the flagged parts of the plan.
-
-    Args:
-        profile: the citizen profile
-        plan: the current (failed) plan
-        issues: list of critic errors to fix
-        max_retries: LLM retry attempts
-
-    Returns:
-        A revised ActionPlan with the issues addressed.
-    """
+    """Revise a plan and validate the result."""
     if not issues:
-        return plan  # nothing to fix
+        return plan
 
-    prompt = _load_prompt()
+    if research is None or not research.chunks:
+        # Avoid asking the model to invent evidence when none is available.
+        return plan
+
+    prompt = _get_prompt()
     client = _get_client()
 
-    user_message = prompt["user"].format(
-        profile=profile.model_dump_json(indent=2),
-        plan=plan.model_dump_json(indent=2),
-        issues="\n".join(f"- {i}" for i in issues),
+    system_prompt = (
+        prompt["system"]
+        + "\n\nReturn only a valid JSON object matching ActionPlan. "
+        "Use the provided research as the only evidence for scheme claims."
+    )
+
+    user_message = _build_user_message(
+        profile,
+        plan,
+        issues,
+        research,
     )
 
     last_error = None
+
     for attempt in range(max_retries):
         try:
             response = client.chat.completions.create(
                 model=MODEL,
                 messages=[
-                    {"role": "system", "content": prompt["system"]},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_message},
                 ],
-                temperature=0.1,
+                temperature=0.2,
                 response_format={"type": "json_object"},
             )
 
             raw_json = response.choices[0].message.content
 
             if not raw_json or not raw_json.strip():
-                print(f"  [Replan] Empty response (attempt {attempt + 1}) — retrying")
-                import time
-                time.sleep(1)
+                last_error = ValueError("Groq returned an empty response.")
+                time.sleep(min(attempt + 1, 2))
                 continue
 
             data = json.loads(raw_json)
+            revised_plan = ActionPlan.model_validate(data)
 
-            try:
-                return ActionPlan(**data)
-            except ValidationError as e:
-                print(f"  [Replan] Schema validation failed (attempt {attempt + 1}): {e}")
-                last_error = e
-                import time
-                time.sleep(1)
-                continue
+            return bind_sources(revised_plan, research, profile)
 
-        except json.JSONDecodeError as e:
-            print(f"  [Replan] Invalid JSON (attempt {attempt + 1}): {e}")
-            last_error = e
-            import time
-            time.sleep(1)
-            continue
+        except RateLimitError as exc:
+            raise RuntimeError(
+                "Groq rate limit reached while revising the action plan."
+            ) from exc
 
-        except Exception as e:
-            print(f"  [Replan] Groq error (attempt {attempt + 1}): {type(e).__name__}")
-            last_error = e
-            import time
-            time.sleep(1)
-            continue
+        except (json.JSONDecodeError, ValidationError, ValueError) as exc:
+            last_error = exc
+            print(
+                f"[Replan] Invalid response on attempt "
+                f"{attempt + 1}/{max_retries}: {exc}"
+            )
+            time.sleep(min(attempt + 1, 2))
+
+        except Exception as exc:
+            last_error = exc
+            print(
+                f"[Replan] Error on attempt "
+                f"{attempt + 1}/{max_retries}: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            time.sleep(min(attempt + 1, 2))
 
     raise RuntimeError(
-        f"Replanning failed after {max_retries} attempts. Last error: {last_error}"
-    )
-
-
-if __name__ == "__main__":
-    from app.agents.understanding import understand
-    from app.agents.research import research
-    from app.agents.planning import plan as build_plan
-    from app.agents.critic import critique
-
-    sample = "My grandmother is 68, widow, lives in Kerala, no income"
-    profile = understand(sample)
-    research_result = research(profile)
-    action_plan = build_plan(profile, research_result)
-    verdict = critique(profile, action_plan)
-
-    print(f"\nOriginal plan: {len(action_plan.eligible_schemes)} schemes")
-    print(f"Verdict: {'PASSED' if verdict.passed else 'FAILED'}")
-    print(f"Errors: {verdict.errors}")
-
-    if not verdict.passed:
-        print("\nRunning Replanner...")
-        fixed_plan = replan(profile, action_plan, verdict.errors)
-        print(f"\nFixed plan: {len(fixed_plan.eligible_schemes)} schemes")
-        for s in fixed_plan.eligible_schemes:
-            print(f"  - {s.name}")
-
-        new_verdict = critique(profile, fixed_plan)
-        print(f"\nNew verdict: {'PASSED' if new_verdict.passed else 'FAILED'}")
-        print(f"Errors: {new_verdict.errors}")
+        f"Failed to revise the action plan. Last error: {last_error}"
+    ) from last_error

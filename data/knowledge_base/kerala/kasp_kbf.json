@@ -1,0 +1,29 @@
+{
+  "doc_id": "kasp_kbf",
+  "source_file": "data/raw/kerala/kasp_kbf.html",
+  "metadata": {
+    "name": "KASP and Karunya Benevolent Fund",
+    "source_url": "https://sha.kerala.gov.in/?page_id=110&lang=en",
+    "publisher": "State Health Agency Kerala",
+    "edition": "Portal reference retrieved October 2026; confirm current eligibility",
+    "retrieved_on": "2026-10-21",
+    "sha256": "d6303b6ccf3de8407df24613833115fea84a775a9216039084d29681a17f5a46",
+    "state": "kerala",
+    "active": true,
+    "extraction_version": 2
+  },
+  "chunks": [
+    "Karunya Arogya Suraksha Padhathi (KASP). From 1st July 2020, the scheme will be implemented directly by Government of Kerala under trust mode (through the newly constituted State Health Agency (SHA)). The claims of Empanelled Health care Providers will be serviced by a TPA/ISA. Current TPA selected through the tender process is Heritage Health Insurance Pvt Ltd. Key Features of KASP – PMJAY • Health care scheme fully financed by the government. • It provides a cover of Rs. 5 lakhs per family per year for secondary and tertiary care hospitalization across public and private empaneled hospitals. • KASP – PMJAY provides cashless access to health care services for the beneficiary at the point of service, that is, the hospital. • KASP – PMJAY envisions to help mitigate catastrophic expenditure on medical treatment. • It covers up to 3 days of pre-hospitalization and 15 days post-hospitalization expenses such as diagnostics and medicines. • There is no restriction on the family size, age or gender. • All pre-existing conditions are covered from day one. • Benefits of the scheme are portable across the country i.e. a beneficiary can visit any empanelled public or private hospital in",
+    "ons are covered from day one. • Benefits of the scheme are portable across the country i.e. a beneficiary can visit any empanelled public or private hospital in India to avail cashless treatment. • Services include approximately 1,573 procedures covering all the costs related to treatment, including but not limited to drugs, supplies, diagnostic services, physician’s fees, room charges, surgeon charges, OT and ICU charges etc. Benefit Cover under KASP – PMJAY Benefit cover under various Government-funded health insurance schemes in India have always been structured on an upper ceiling limit ranging from an annual cover of INR30,000 to INR3,00,000 per family across various States which created a fragmented system. KASP – PMJAY provides cashless cover of up to INR5,00,000 to each eligible family per annul for listed secondary and tertiary care conditions. The cover under the scheme includes all expenses incurred on the following components of the treatment. • Medical examination, treatment and consultation • Pre-hospitalization • Medicine and medical consumables • Non-intensive and intensive care services • Diagnostic and laboratory investigations • Medical implantation services",
+    "zation • Medicine and medical consumables • Non-intensive and intensive care services • Diagnostic and laboratory investigations • Medical implantation services (where necessary) • Accommodation benefits • Complications arising during treatment • Post-hospitalization follow-up care up to 15 days The benefits of INR 5,00,000 are on a family floater basis which means that it can be used by one or all members of the family. The RSBY had a family cap of five members. However, based on learning’s from those schemes, KASP – PMJAY has been designed in such a way that there is no cap on family size or age of members. In addition, pre-existing diseases are covered from the very first day. This means that any eligible person suffering from any medical condition before being covered by KASP – PMJAY will now be able to get treatment for all those medical conditions as well under this scheme right from the day they are enrolled. Karunya Benevolent Fund (KBF) KARUNYA BENEVOLENT FUND (KBF) is an assurance scheme of the State Government which provides financial aid for poor people suffering from serious ailments, by raising funds through Kerala lottery. The scheme is managed by the State",
+    "rnment which provides financial aid for poor people suffering from serious ailments, by raising funds through Kerala lottery. The scheme is managed by the State Lotteries Department (Taxes). Karunya Benevolent Fund is providing financial assistance to under-privileged people suffering from acute ailments like Cancer, Haemophilia, Kidney and Heart diseases and for Palliative Care. The amount for the health scheme is raised through lottery. This welfare measure is helpful to those who suffer from ailments, the cost of treatment of which are proved to be unbearable to lower and even middle strata of society with an annual family income of less than Rs. 3 lakhs. Eligible beneficiary can approach any KASP empaneled hospitals for availing cashless treatment Significant increase in number of health care providers under KBF scheme. Number of treatment packages also increase IT integration enhances patient friendly approaches in KBF schem e"
+  ],
+  "chunk_pages": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "num_chunks": 4,
+  "char_count": 4524
+}

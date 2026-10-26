@@ -16,6 +16,12 @@ class CitizenProfile(BaseModel):
     occupation: str | None = None
     category: Literal["general", "obc", "sc", "st", "ews"] | None = None
     family_size: int | None = None
+    interests: list[str] = []
+    strengths: list[str] = []
+    career_goal: str | None = None
+    education_level: str | None = None
+    subjects: list[str] = []
+    retrieval_query: str = ""
 
     life_events: list[str] = []
     missing_fields: list[str] = []
@@ -26,7 +32,7 @@ class CitizenProfile(BaseModel):
 
     raw_input: str = ""
 
-    @field_validator("life_events", "missing_fields", mode="before")
+    @field_validator("life_events", "missing_fields", "interests", "strengths", "subjects", "followup_questions", mode="before")
     @classmethod
     def none_to_empty_list(cls, v):
         """Convert None to empty list for list fields."""
