@@ -49,11 +49,26 @@ def bind_sources(
         for option in plan.eligible_schemes:
             # Learning resources should not inherit government-scheme
             # eligibility language or unsupported admission requirements.
-            option.eligibility_note = (
-                "This career guidance does not establish your eligibility "
-                "for admission. Confirm current requirements with the "
-                "official institution before applying."
-            )
+            name = option.name.lower()
+
+            if any(term in name for term in ("mdn", "freecodecamp", "free code camp")):
+                option.eligibility_note = (
+                    "Use this resource to practise the listed skills and "
+                    "complete its learning exercises. Check the resource "
+                    "itself for current course and certification details."
+                )
+            elif any(term in name for term in ("bca", "degree", "college", "university")):
+                option.eligibility_note = (
+                    "Confirm current admission eligibility, fees, and "
+                    "application deadlines with the institution."
+                )
+            else:
+                option.eligibility_note = (
+                    "This career guidance does not establish your "
+                    "eligibility for admission. Review the resource's "
+                    "current requirements, costs, and learning outcomes "
+                    "before committing."
+                )
 
             # Remove explicit guarantees that cannot be established
             # by the recommendation alone.
