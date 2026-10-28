@@ -34,7 +34,6 @@ defaults = {
     "theme": "light",
     "page": "scheme",
     "results": None,
-    "followup": None,
     "voice_query": "",
     "voice_text": "",
 }
@@ -198,8 +197,7 @@ st.markdown(
         border-color: #AD624A !important;
     }}
 
-    /* Bordered containers: subtle background and compact spacing.
-       Do not style every nested Streamlit block as a card. */
+    /* Bordered containers */
     [data-testid="stVerticalBlockBorderWrapper"] {{
         background: {CARD_BG} !important;
         border: 1px solid {BORDER} !important;
@@ -270,7 +268,7 @@ st.markdown(
         margin: 0;
     }}
 
-    /* Result components used by the results renderer */
+    /* Result components */
     .greeting {{
         font-family: 'Lora', Georgia, serif;
         font-size: 19px;
@@ -452,7 +450,6 @@ def render_sidebar():
         ):
             st.session_state.page = "scheme"
             st.session_state.results = None
-            st.session_state.followup = None
             st.rerun()
 
         if st.button(
@@ -466,7 +463,6 @@ def render_sidebar():
         ):
             st.session_state.page = "mentor"
             st.session_state.results = None
-            st.session_state.followup = None
             st.rerun()
 
         st.markdown(
@@ -499,7 +495,6 @@ def render_sidebar():
             st.session_state.user = None
             st.session_state.token = None
             st.session_state.results = None
-            st.session_state.followup = None
             st.rerun()
 
 
@@ -683,10 +678,7 @@ def render_auth():
 
 # -------------------- Query runner --------------------
 
-def run_query(
-    query: str,
-    followup_answers: dict[str, str] | None = None,
-):
+def run_query(query: str):
     if not query.strip():
         st.warning("Please describe your situation.")
         return
@@ -698,7 +690,6 @@ def run_query(
             result = run_pipeline(
                 query,
                 mode=st.session_state.page,
-                followup_answers=followup_answers,
             )
 
     except Exception as exc:
@@ -708,27 +699,15 @@ def run_query(
         ):
             st.warning(
                 "The language service is busy or its quota has been "
-                "reached. Please retry later; your answers are still "
-                "available."
+                "reached. Please retry later."
             )
         else:
             st.error(
-                "The request could not be completed. Please retry; "
-                "your answers are still available."
+                "The request could not be completed. Please retry."
             )
         return
 
-    if result.get("needs_followup"):
-        st.session_state.followup = {
-            "questions": result.get("followup_questions", []),
-            "original_query": query,
-            "answers": followup_answers or {},
-        }
-        st.session_state.results = None
-    else:
-        st.session_state.followup = None
-        st.session_state.results = result
-
+    st.session_state.results = result
     st.rerun()
 
 
@@ -804,53 +783,6 @@ def render_app():
                         st.session_state.voice_query = extracted
                         st.session_state.voice_text = extracted
                         st.rerun()
-
-    # Follow-up questions
-    if st.session_state.followup:
-        st.info(
-            "To give you the best guidance, "
-            "I need a little more information:"
-        )
-
-        pending = st.session_state.followup
-        answers = dict(pending.get("answers", {}))
-
-        with st.form("followup_form"):
-            current_answers = {}
-
-            for question in pending["questions"]:
-                current_answers[question] = st.text_input(
-                    question,
-                    value=answers.get(question, ""),
-                    key=(
-                        f"fu_{st.session_state.page}_"
-                        f"{pending['original_query']}_{question}"
-                    ),
-                )
-
-            submitted = st.form_submit_button("Submit Answers")
-
-        if submitted:
-            if not any(
-                answer.strip()
-                for answer in current_answers.values()
-            ):
-                st.warning(
-                    "Please answer at least one question so I can continue."
-                )
-            else:
-                answers.update({
-                    question: answer.strip()
-                    for question, answer in current_answers.items()
-                    if answer.strip()
-                })
-
-                run_query(
-                    pending["original_query"],
-                    followup_answers=answers,
-                )
-
-        return
 
     # Main query
     if st.session_state.page == "scheme":

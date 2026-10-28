@@ -14,7 +14,6 @@ class SahayakState(TypedDict, total=False):
     raw_input: str
     mode: str
     requested_mode: str | None
-    followup_answers: dict[str, str]
 
     profile: CitizenProfile | None
     research: ResearchResult | None
@@ -23,5 +22,3 @@ class SahayakState(TypedDict, total=False):
 
     iterations: int
     final_response: str | None
-    needs_followup: bool
-    followup_questions: list[str]

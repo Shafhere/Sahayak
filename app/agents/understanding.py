@@ -1,3 +1,4 @@
+
 """Understanding Agent — extracts structured profile from natural language."""
 import sys
 from pathlib import Path
@@ -54,6 +55,18 @@ AGE_PATTERNS = [
     r"(\d+)\s*(?:வயது)",
 ]
 
+KNOWN_STATES = [
+    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar",
+    "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh",
+    "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh",
+    "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
+    "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
+    "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand",
+    "West Bengal", "Andaman and Nicobar Islands", "Chandigarh",
+    "Dadra and Nagar Haveli and Daman and Diu", "Delhi",
+    "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry",
+]
+
 _cached_prompt = None
 _cached_client = None
 
@@ -61,141 +74,137 @@ _cached_client = None
 def _load_prompt() -> dict:
     """Load prompt once, cache it."""
     global _cached_prompt
+
     if _cached_prompt is None:
         with open(PROMPT_PATH, "r", encoding="utf-8") as f:
             _cached_prompt = yaml.safe_load(f)
+
     return _cached_prompt
 
 
 def _get_client() -> Groq:
     """Get or create the singleton Groq client."""
     global _cached_client
+
     if _cached_client is None:
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             raise RuntimeError("GROQ_API_KEY not set")
-        _cached_client = Groq(api_key=api_key, timeout=30.0, max_retries=1)
+
+        _cached_client = Groq(
+            api_key=api_key,
+            timeout=30.0,
+            max_retries=1,
+        )
+
     return _cached_client
 
 
-def _postprocess(
-    data: dict,
-    raw_input: str,
-    followup_answers: dict[str, str] | None = None,
-) -> dict:
-    """Fix common LLM mistakes using deterministic rules."""
-    # 0. Fix None values for list fields
-    if data.get("life_events") is None:
-        data["life_events"] = []
-    if data.get("missing_fields") is None:
-        data["missing_fields"] = []
+def _postprocess(data: dict, raw_input: str) -> dict:
+    """Correct common LLM extraction mistakes using deterministic rules."""
 
-    # 1. Category: lowercase + validate
-    cat = data.get("category")
-    if isinstance(cat, str):
-        cat = cat.strip().lower()
-        if cat not in VALID_CATEGORIES:
-            cat = None
-    data["category"] = cat
+    # 1. Normalize list fields that the LLM returned as None.
+    for field in (
+        "life_events",
+        "missing_fields",
+        "interests",
+        "strengths",
+        "subjects",
+    ):
+        if data.get(field) is None:
+            data[field] = []
 
-    # 2. Gender: infer from keywords if missing
+    # 2. Normalize and validate category.
+    category = data.get("category")
+
+    if isinstance(category, str):
+        category = category.strip().lower()
+        if category not in VALID_CATEGORIES:
+            category = None
+
+    data["category"] = category
+
+    # 3. Infer gender from the original message if missing.
     if not data.get("gender"):
         lower = raw_input.lower()
+
         for keyword, gender in GENDER_KEYWORDS.items():
             if keyword in lower:
                 data["gender"] = gender
                 break
 
-    # 3. Age: extract from the original message and follow-up answers
+    # 4. Extract age from the original message if the LLM missed it.
     if data.get("age") is None:
-        followup_text = " ".join(
-            f"{question}: {answer}"
-            for question, answer in (followup_answers or {}).items()
-            if isinstance(question, str) and isinstance(answer, str)
-        )
-        age_text = f"{raw_input}\n{followup_text}"
-
         for pattern in AGE_PATTERNS:
-            match = re.search(pattern, age_text, re.IGNORECASE)
+            match = re.search(pattern, raw_input, re.IGNORECASE)
+
             if match:
                 age = int(match.group(1))
+
                 if 1 <= age <= 120:
                     data["age"] = age
                     break
 
-    
-    # 3b. State: recover a state explicitly given in follow-up answers
+    # 5. Extract an explicitly mentioned Indian state if missing.
     if not data.get("state"):
-        followup_text = " ".join(
-            answer
-            for answer in (followup_answers or {}).values()
-            if isinstance(answer, str)
-        ).strip()
-
-        known_states = [
-            "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar",
-            "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh",
-            "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh",
-            "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
-            "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
-            "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand",
-            "West Bengal", "Andaman and Nicobar Islands", "Chandigarh",
-            "Dadra and Nagar Haveli and Daman and Diu", "Delhi",
-            "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry",
-        ]
-
-        for state in known_states:
+        for state in KNOWN_STATES:
             if re.search(
                 rf"(?<!\w){re.escape(state)}(?!\w)",
-                followup_text,
+                raw_input,
                 re.IGNORECASE,
             ):
                 data["state"] = state
                 break
 
-
-
-    # 4. Emotion: detect grief from keywords if LLM said neutral
+    # 6. Detect grief from keywords if the LLM returned neutral.
     if data.get("emotion") == "neutral":
         lower = raw_input.lower()
+
         for keyword in GRIEF_KEYWORDS:
             if keyword.lower() in lower:
                 data["emotion"] = "grief"
                 break
 
-    # 5. Life events: infer spouse_death from widow/widower
+    # 7. Infer spouse_death from widow/widower keywords.
     if not data.get("life_events"):
         lower = raw_input.lower()
-        if any(kw in lower for kw in ["widow", "വിധവ", "विधवा", "விதவை", "widower"]):
+
+        if any(
+            keyword in lower
+            for keyword in ["widow", "വിധവ", "विधवा", "விதவை", "widower"]
+        ):
             data["life_events"] = ["spouse_death"]
 
-    # 6. Remove inferred fields from missing_fields
+    # 8. Remove successfully extracted fields from missing_fields.
     missing = data.get("missing_fields", [])
+
     for field in ["age", "gender", "category"]:
         if data.get(field) is not None and field in missing:
             missing.remove(field)
+
     data["missing_fields"] = missing
 
-    # 7. Ensure raw_input is set
+    # 9. Preserve the original user message.
     data["raw_input"] = raw_input
 
     return data
 
+
 @traceable(run_type="chain", name="1. Understanding Agent")
-def understand(user_input: str, max_retries: int = 5, requested_mode: str | None = None,
-               followup_answers: dict[str, str] | None = None) -> CitizenProfile:
-    """Read a citizen's message and return a structured CitizenProfile."""
+def understand(
+    user_input: str,
+    max_retries: int = 5,
+    requested_mode: str | None = None,
+) -> CitizenProfile:
+    """Extract a structured citizen profile from a single user message."""
+
     prompt = _load_prompt()
     client = _get_client()
+
     user_message = prompt["user"].format(raw_input=user_input)
 
     if requested_mode:
         user_message += "\nSelected mode (preserve this): " + requested_mode
-    if followup_answers:
-        user_message += (
-            "\nFollow-up questions and citizen answers (JSON): "
-            + json.dumps(followup_answers, ensure_ascii=False)
-        )
 
     last_error = None
 
@@ -214,36 +223,34 @@ def understand(user_input: str, max_retries: int = 5, requested_mode: str | None
             raw_json = response.choices[0].message.content
 
             if not raw_json or not raw_json.strip():
-                print(f"  [Understand] Empty response (attempt {attempt + 1}) — retrying")
+                print(
+                    f"  [Understand] Empty response "
+                    f"(attempt {attempt + 1}) — retrying"
+                )
                 continue
 
             data = json.loads(raw_json)
-            data = _postprocess(data, user_input, followup_answers)
+            data = _postprocess(data, user_input)
 
             if requested_mode:
                 data["mode"] = requested_mode
 
-            # Both modes are single-turn now. Follow-ups are never returned
-            # from the understanding stage. Mentor mode places its
-            # self-assessment questions inside the plan's next_steps instead.
-            data["needs_followup"] = False
-            data["followup_questions"] = []
-
-            if data.get("user_said_enough"):
-                data["needs_followup"] = False
-
-            if not data.get("needs_followup"):
-                data["followup_questions"] = []
-
             try:
                 return CitizenProfile(**data)
+
             except ValidationError as e:
-                print(f"  [Understand] Schema validation failed (attempt {attempt + 1}): {e}")
+                print(
+                    f"  [Understand] Schema validation failed "
+                    f"(attempt {attempt + 1}): {e}"
+                )
                 last_error = e
                 continue
 
         except json.JSONDecodeError as e:
-            print(f"  [Understand] Invalid JSON (attempt {attempt + 1}): {e}")
+            print(
+                f"  [Understand] Invalid JSON "
+                f"(attempt {attempt + 1}): {e}"
+            )
             last_error = e
             continue
 
@@ -262,7 +269,8 @@ def understand(user_input: str, max_retries: int = 5, requested_mode: str | None
             continue
 
     raise RuntimeError(
-        f"Understanding failed after {max_retries} attempts. Last error: {last_error}"
+        f"Understanding failed after {max_retries} attempts. "
+        f"Last error: {last_error}"
     )
 
 

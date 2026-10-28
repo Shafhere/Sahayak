@@ -32,77 +32,226 @@ def test_planner_uses_actual_prompt_and_passes_evidence(monkeypatch):
     assert "https://example.org/pension" in message
 
 
-def test_followup_stops_before_research(monkeypatch):
-    research = Mock(side_effect=AssertionError("Research must wait for answers"))
+
+def test_workflow_does_not_stop_for_followup_flags(monkeypatch):
+    """Legacy follow-up flags must not interrupt the single-turn workflow."""
     monkeypatch.setattr(graph, "understand_node", lambda state: {
-        "needs_followup": True, "followup_questions": ["Which state?"],
-        "profile": CitizenProfile(needs_followup=True), "iterations": 0})
-    monkeypatch.setattr(graph, "research_node", research)
+        "profile": CitizenProfile(mode="mentor"),
+        "needs_followup": True,  # Legacy field should not control routing.
+        "followup_questions": ["Which state?"],
+        "iterations": 0,
+    })
+    monkeypatch.setattr(
+        graph,
+        "research_node",
+        lambda state: {"research": ResearchResult(
+            query="career guidance",
+            mode="mentor",
+            source="test",
+            num_results=0,
+            chunks=[],
+        )},
+    )
+    monkeypatch.setattr(
+        graph,
+        "plan_node",
+        lambda state: {"plan": ActionPlan(next_steps=["Compare courses"])},
+    )
+    monkeypatch.setattr(
+        graph,
+        "critic_node",
+        lambda state: {"verdict": CriticVerdict(passed=True), "iterations": 1},
+    )
+    monkeypatch.setattr(graph, "_graph", None)
+
     result = graph.build_graph().invoke({"raw_input": "Help me"})
-    assert result["needs_followup"] and not result.get("plan")
-    research.assert_not_called()
+
+    assert result["plan"].next_steps == ["Compare courses"]
+    assert result["verdict"].passed
 
 
-@pytest.mark.parametrize("direction", [{"interests": ["math"]},
-                                       {"strengths": ["writing"]},
-                                       {"career_goal": "doctor"}])
-def test_mentor_direction_does_not_repeat_followup(monkeypatch, direction):
-    """Mentor mode never returns follow-ups from the understanding stage."""
-    client = fake_client({"mode": "mentor", "needs_followup": True,
-                          "followup_questions": ["Again?"], **direction})
+
+
+@pytest.mark.parametrize(
+    "direction",
+    [
+        {"interests": ["math"]},
+        {"strengths": ["writing"]},
+        {"career_goal": "doctor"},
+    ],
+)
+def test_mentor_direction_is_extracted_without_followups(monkeypatch, direction):
+    """Mentor profile extraction works without conversational follow-ups."""
+    client = fake_client({
+        "mode": "mentor",
+        "needs_followup": True,
+        "followup_questions": ["Again?"],
+        **direction,
+    })
     monkeypatch.setattr(understanding, "_get_client", lambda: client)
+
     profile = understanding.understand(
         "After school?",
         requested_mode="mentor",
-        followup_answers={"What do you enjoy?": "Math"},
     )
+
     assert profile.mode == "mentor"
-    assert not profile.needs_followup
-    assert profile.followup_questions == []
+
+    for field, expected in direction.items():
+        assert getattr(profile, field) == expected
+
     message = client.chat.completions.create.call_args.kwargs["messages"][1]["content"]
-    # The requested mode and follow-up answers must still reach the LLM prompt,
-    # even though no follow-up form is returned.
-    assert "Math" in message
     assert "Selected mode (preserve this): mentor" in message
+    assert "followup_answers" not in message
 
 
-def test_mentor_without_direction_asks_no_followup(monkeypatch):
-    """Mentor mode is single-turn — no follow-up forms are returned."""
-    monkeypatch.setattr(understanding, "_get_client",
-                        lambda: fake_client({"mode": "mentor"}))
+def test_mentor_without_direction_returns_profile(monkeypatch):
+    """Mentor mode returns a profile even when direction is unknown."""
+    monkeypatch.setattr(
+        understanding,
+        "_get_client",
+        lambda: fake_client({"mode": "mentor"}),
+    )
+
     profile = understanding.understand("Finished class 12")
+
     assert profile.mode == "mentor"
-    assert not profile.needs_followup
-    assert profile.followup_questions == []
+    assert profile.interests == []
+    assert profile.strengths == []
     assert profile.age is None
 
 
-def test_proceed_respects_user_choice(monkeypatch):
-    monkeypatch.setattr(understanding, "_get_client", lambda: fake_client(
-        {"mode": "mentor", "user_said_enough": True, "needs_followup": True}))
-    assert not understanding.understand("Just help me").needs_followup
+def test_legacy_followup_flags_are_ignored(monkeypatch):
+    """Legacy follow-up fields in an LLM response do not affect the profile."""
+    monkeypatch.setattr(
+        understanding,
+        "_get_client",
+        lambda: fake_client({
+            "mode": "mentor",
+            "user_said_enough": True,
+            "needs_followup": True,
+            "followup_questions": ["Another question?"],
+        }),
+    )
+
+    profile = understanding.understand("Just help me")
+
+    assert profile.mode == "mentor"
+    assert not hasattr(profile, "needs_followup")
+    assert not hasattr(profile, "followup_questions")
+    assert not hasattr(profile, "user_said_enough")
 
 
-def test_answers_reach_graph_and_success_finishes(monkeypatch):
+def test_known_pension_context_extracts_profile_without_followups(monkeypatch):
+    """Known pension context is extracted without follow-up processing."""
+    monkeypatch.setattr(
+        understanding,
+        "_get_client",
+        lambda: fake_client({
+            "mode": "scheme",
+            "state": "Kerala",
+            "age": 68,
+            "life_events": ["spouse_death"],
+            "needs_followup": True,
+            "followup_questions": ["Occupation?"],
+        }),
+    )
+
+    profile = understanding.understand(
+        "My grandmother is 68, a widow in Kerala.",
+        requested_mode="scheme",
+    )
+
+    assert profile.mode == "scheme"
+    assert profile.age == 68
+    assert profile.gender == "female"
+    assert profile.state == "Kerala"
+    assert profile.life_events == ["spouse_death"]
+    assert not hasattr(profile, "needs_followup")
+    assert not hasattr(profile, "followup_questions")
+
+
+def test_age_is_extracted_from_original_message(monkeypatch):
+    """Deterministic age extraction uses the original user message."""
+    monkeypatch.setattr(
+        understanding,
+        "_get_client",
+        lambda: fake_client({"mode": "scheme", "language": "en"}),
+    )
+
+    profile = understanding.understand(
+        "I am 68 years old and need help finding a government scheme.",
+        requested_mode="scheme",
+    )
+
+    assert profile.age == 68
+
+
+def test_state_is_extracted_from_original_message(monkeypatch):
+    """Deterministic state extraction uses the original user message."""
+    monkeypatch.setattr(
+        understanding,
+        "_get_client",
+        lambda: fake_client({"mode": "scheme", "language": "en"}),
+    )
+
+    profile = understanding.understand(
+        "I live in Kerala and need help finding a government scheme.",
+        requested_mode="scheme",
+    )
+
+    assert profile.state == "Kerala"
+
+
+
+
+def test_single_turn_pipeline_passes_mode_and_finishes(monkeypatch):
+    """The selected mode reaches understanding without follow-up answers."""
     seen = {}
 
     def understand(state):
         seen.update(state)
-        return {"profile": CitizenProfile(mode="mentor"), "needs_followup": False}
+        return {"profile": CitizenProfile(mode="mentor"), "iterations": 0}
 
     monkeypatch.setattr(graph, "understand_node", understand)
-    monkeypatch.setattr(graph, "research_node", lambda state: {})
-    monkeypatch.setattr(graph, "plan_node", lambda state: {"plan": ActionPlan(next_steps=["Compare courses"])})
-    monkeypatch.setattr(graph, "critic_node", lambda state: {"verdict": CriticVerdict(passed=True)})
+    monkeypatch.setattr(
+        graph,
+        "research_node",
+        lambda state: {"research": ResearchResult(
+            query="career guidance",
+            mode="mentor",
+            source="test",
+            num_results=0,
+            chunks=[],
+        )},
+    )
+    monkeypatch.setattr(
+        graph,
+        "plan_node",
+        lambda state: {"plan": ActionPlan(next_steps=["Compare courses"])},
+    )
+    monkeypatch.setattr(
+        graph,
+        "critic_node",
+        lambda state: {
+            "verdict": CriticVerdict(passed=True),
+            "iterations": 1,
+        },
+    )
     monkeypatch.setattr(graph, "_graph", None)
-    result = graph.run_pipeline("After school?", "mentor", {"Interests?": "Math"})
+    monkeypatch.setattr(graph, "record_run", lambda *args, **kwargs: None)
+
+    result = graph.run_pipeline("After school?", "mentor")
+
     assert seen["requested_mode"] == "mentor"
-    assert seen["followup_answers"] == {"Interests?": "Math"}
+    assert "followup_answers" not in seen
     assert result["plan"].next_steps == ["Compare courses"]
+    assert result["verdict"].passed
+
 
 
 def test_failed_critic_stops_at_limit(monkeypatch):
-    monkeypatch.setattr(graph, "understand_node", lambda state: {"needs_followup": False, "iterations": 0})
+    monkeypatch.setattr(graph, "understand_node", lambda state: {"iterations": 0})
     monkeypatch.setattr(graph, "research_node", lambda state: {})
     monkeypatch.setattr(graph, "plan_node", lambda state: {"plan": ActionPlan()})
     monkeypatch.setattr(graph, "critic_node", lambda state: {
@@ -115,47 +264,60 @@ def test_failed_critic_stops_at_limit(monkeypatch):
     assert replan.call_count == 2
 
 
-def test_known_pension_context_does_not_require_unrelated_followups(monkeypatch):
-    monkeypatch.setattr(understanding, "_get_client", lambda: fake_client({
-        "mode": "scheme",
-        "state": "kerala",
-        "age": 68,
-        "life_events": ["spouse_death"],
-        "needs_followup": True,
-        "followup_questions": ["Occupation?"],
-    }))
+def test_known_pension_context_extracts_profile_without_followups(monkeypatch):
+    """Known pension context is extracted without follow-up processing."""
+    monkeypatch.setattr(
+        understanding,
+        "_get_client",
+        lambda: fake_client({
+            "mode": "scheme",
+            "state": "kerala",
+            "age": 68,
+            "life_events": ["spouse_death"],
+            "needs_followup": True,
+            "followup_questions": ["Occupation?"],
+        }),
+    )
+
     profile = understanding.understand(
         "My grandmother is 68, a widow in Kerala.",
         requested_mode="scheme",
     )
-    assert not profile.needs_followup and not profile.followup_questions
 
+    assert profile.mode == "scheme"
+    assert profile.age == 68
+    assert profile.gender == "female"
+    assert profile.state.lower() == "kerala"
+    assert profile.life_events == ["spouse_death"]
+    assert not hasattr(profile, "needs_followup")
+    assert not hasattr(profile, "followup_questions")
 
-def test_followup_answers_are_used_for_deterministic_age_extraction(monkeypatch):
-    client = fake_client({"mode": "scheme", "language": "en"})
-    monkeypatch.setattr(understanding, "_get_client", lambda: client)
+def test_age_is_extracted_from_original_message(monkeypatch):
+    """Age extraction uses the original user message."""
+    monkeypatch.setattr(
+        understanding,
+        "_get_client",
+        lambda: fake_client({"mode": "scheme", "language": "en"}),
+    )
 
     profile = understanding.understand(
-        "I need help finding a government scheme.",
+        "I am 68 years old and need help finding a government scheme.",
         requested_mode="scheme",
-        followup_answers={
-            "How old is the applicant?": "The applicant is 68 years old."
-        },
     )
 
     assert profile.age == 68
 
-
-def test_followup_answers_are_used_for_state_extraction(monkeypatch):
-    client = fake_client({"mode": "scheme", "language": "en"})
-    monkeypatch.setattr(understanding, "_get_client", lambda: client)
+def test_state_is_extracted_from_original_message(monkeypatch):
+    """State extraction uses the original user message."""
+    monkeypatch.setattr(
+        understanding,
+        "_get_client",
+        lambda: fake_client({"mode": "scheme", "language": "en"}),
+    )
 
     profile = understanding.understand(
-        "I need help finding a government scheme.",
+        "I live in Kerala and need help finding a government scheme.",
         requested_mode="scheme",
-        followup_answers={
-            "Which state do you live in?": "Kerala"
-        },
     )
 
     assert profile.state == "Kerala"

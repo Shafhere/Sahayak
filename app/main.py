@@ -1,4 +1,6 @@
-"""FastAPI application entry point."""
+
+"""FastAPI application entry point for Sahayak."""
+
 from fastapi import FastAPI
 from app.api import auth
 
@@ -11,6 +13,10 @@ app = FastAPI(
 app.include_router(auth.router)
 
 
-@app.get("/health")
+@app.get("/health", tags=["Health"])
 def health():
-    return {"status": "ok", "service": "sahayak"}
+    """Liveness check: confirms that the API process is responding."""
+    return {
+        "status": "ok",
+        "service": "sahayak",
+    }

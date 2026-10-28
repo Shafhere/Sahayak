@@ -1,9 +1,9 @@
 
-"""The Sahayak LangGraph workflow: five agents in a stateful loop."""
+"""Build and run the Sahayak five-agent workflow."""
 
 import time
 
-from langgraph.graph import StateGraph, START, END
+from langgraph.graph import END, START, StateGraph
 
 from app.workflows.state import SahayakState
 from app.workflows.nodes import (
@@ -16,60 +16,49 @@ from app.workflows.nodes import (
 from app.workflows.metrics import record_run
 
 
-MAX_ITERATIONS = 3
+MAX_CRITIC_ATTEMPTS = 3
 
 
 def should_replan(state: SahayakState) -> str:
-    """Decide whether to replan or finish after the critic runs."""
+    """Stop on success or at the limit; otherwise revise the plan."""
     verdict = state.get("verdict")
-    iterations = state.get("iterations", 0)
+    attempts = state.get("iterations", 0)
 
-    # An absent verdict means an upstream step did not produce one.
     if verdict is None:
-        return "end"
+        raise RuntimeError(
+            "Workflow validation failed: the critic produced no verdict."
+        )
 
-    # A passing verdict means the plan is ready.
     if verdict.passed:
         return "end"
 
-    # Return the best available plan when the iteration limit is reached.
-    if iterations >= MAX_ITERATIONS:
-        print(
-            f"[Graph] Maximum iterations ({MAX_ITERATIONS}) reached. "
-            "Returning the best available plan."
-        )
+    if attempts >= MAX_CRITIC_ATTEMPTS:
         return "end"
+
+    if not verdict.errors:
+        raise RuntimeError(
+            "The critic rejected the plan but provided no correction details."
+        )
 
     return "replan"
 
 
 def build_graph():
-    """Build and compile the Sahayak workflow."""
-    graph = StateGraph(SahayakState)
+    """Construct and compile the Sahayak workflow."""
+    workflow = StateGraph(SahayakState)
 
-    graph.add_node("understand", understand_node)
-    graph.add_node("research", research_node)
-    graph.add_node("plan", plan_node)
-    graph.add_node("critic", critic_node)
-    graph.add_node("replan", replan_node)
+    workflow.add_node("understand", understand_node)
+    workflow.add_node("research", research_node)
+    workflow.add_node("plan", plan_node)
+    workflow.add_node("critic", critic_node)
+    workflow.add_node("replan", replan_node)
 
-    graph.add_edge(START, "understand")
+    workflow.add_edge(START, "understand")
+    workflow.add_edge("understand", "research")
+    workflow.add_edge("research", "plan")
+    workflow.add_edge("plan", "critic")
 
-    graph.add_conditional_edges(
-        "understand",
-        lambda state: (
-            "followup" if state.get("needs_followup") else "research"
-        ),
-        {
-            "followup": END,
-            "research": "research",
-        },
-    )
-
-    graph.add_edge("research", "plan")
-    graph.add_edge("plan", "critic")
-
-    graph.add_conditional_edges(
+    workflow.add_conditional_edges(
         "critic",
         should_replan,
         {
@@ -78,17 +67,16 @@ def build_graph():
         },
     )
 
-    # Recheck the revised plan with the critic.
-    graph.add_edge("replan", "critic")
+    workflow.add_edge("replan", "critic")
 
-    return graph.compile()
+    return workflow.compile()
 
 
 _graph = None
 
 
 def get_graph():
-    """Return the cached compiled workflow."""
+    """Build the compiled graph once per process."""
     global _graph
 
     if _graph is None:
@@ -97,26 +85,36 @@ def get_graph():
     return _graph
 
 
-def run_pipeline(
-    raw_input: str,
-    mode: str | None = None,
-    followup_answers: dict[str, str] | None = None,
-) -> dict:
-    """Run the workflow and record non-sensitive aggregate metrics."""
+def run_pipeline(raw_input: str, mode: str | None = None) -> dict:
+    """Run Sahayak and record non-sensitive aggregate metrics."""
+    if not isinstance(raw_input, str) or not raw_input.strip():
+        raise ValueError("Please enter a non-empty message.")
+
     if mode not in (None, "scheme", "mentor"):
-        raise ValueError("Choose scheme or mentor mode")
+        raise ValueError("Mode must be 'scheme', 'mentor', or None.")
 
     initial_state = {
-        "raw_input": raw_input,
+        "raw_input": raw_input.strip(),
         "requested_mode": mode,
-        "followup_answers": followup_answers or {},
     }
 
-    graph = get_graph()
     start = time.perf_counter()
 
     try:
-        result = graph.invoke(initial_state)
+        result = get_graph().invoke(initial_state)
+
+        required_fields = ("profile", "research", "plan", "verdict")
+        missing = [
+            field for field in required_fields
+            if result.get(field) is None
+        ]
+
+        if missing:
+            raise RuntimeError(
+                "Workflow ended without required results: "
+                + ", ".join(missing)
+            )
+
     except Exception:
         record_run({}, time.perf_counter() - start, failed=True)
         raise
@@ -125,28 +123,23 @@ def run_pipeline(
     return result
 
 
+
 if __name__ == "__main__":
     sample = "My grandmother is 68, widow, lives in Kerala, no income"
-    result = run_pipeline(sample)
+    result = run_pipeline(sample, mode="scheme")
 
-    profile = result.get("profile")
-    plan = result.get("plan")
-    verdict = result.get("verdict")
+    profile = result["profile"]
+    plan = result["plan"]
+    verdict = result["verdict"]
 
-    print("\n" + "=" * 60)
-    print(f"Mode: {profile.mode if profile else 'N/A'}")
-    print(f"Iterations: {result.get('iterations', 0)}")
-    print(
-        f"Verdict: "
-        f"{'PASSED' if verdict and verdict.passed else 'FAILED'}"
-    )
-    print("=" * 60)
+    print(f"\nMode: {profile.mode}")
+    print(f"Critic attempts: {result.get('iterations', 0)}")
+    print(f"Validation: {'PASSED' if verdict.passed else 'NOT PASSED'}")
 
-    if plan:
-        print(f"\nSchemes: {len(plan.eligible_schemes)}")
-        for scheme in plan.eligible_schemes:
-            print(f"  - {scheme.name}")
+    print(f"\nSchemes: {len(plan.eligible_schemes)}")
+    for scheme in plan.eligible_schemes:
+        print(f" - {scheme.name}")
 
-        print(f"Documents: {len(plan.document_checklist)}")
-        print(f"Timeline: {len(plan.timeline)} steps")
-        print(f"Estimated benefit: Rs {plan.estimated_annual_benefit:,}")
+    print(f"Documents: {len(plan.document_checklist)}")
+    print(f"Timeline steps: {len(plan.timeline)}")
+    print(f"Estimated annual benefit: Rs {plan.estimated_annual_benefit:,}")
