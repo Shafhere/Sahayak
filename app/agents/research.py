@@ -9,7 +9,14 @@ from app.schemas.citizen import CitizenProfile
 from app.schemas.research import ResearchResult, RetrievedChunk
 from langsmith import traceable
 
+
+import os
+USE_RERANKER = (
+    os.getenv("SAHAYAK_USE_RERANKER", "true").lower() == "true"
+)
+
 MODES_WITH_DATA = {"scheme", "mentor"}
+USE_RERANKER = os.getenv("SAHAYAK_USE_RERANKER", "true").lower() == "true"
 MIN_RERANK_SCORE = 0.5
 # Cross-encoder logits are not probabilities. Reviewed career catalogues use a
 # separate cutoff, checked against supported paraphrases and unrelated controls.
@@ -95,7 +102,7 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
     from app.rag.vector_store import search as vector_search
     from app.rag.bm25 import get_bm25_index
     from app.rag.rrf import reciprocal_rank_fusion
-    from app.rag.rerank import rerank
+
 
     query = _build_query(profile)
 
@@ -141,10 +148,23 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
     if profile.mode == "mentor":
         fused = [c for c in fused if _source_matches_intent(c.get("doc_id", ""), query)]
 
-    # 4. Rerank with source context.
+        # 4. Rerank with source context.
     for candidate in fused:
-        candidate["ranking_text"] = candidate.get("name", "") + "\n" + candidate["text"]
-    reranked = rerank(query, fused[:35], text_key="ranking_text", top_k=35)
+        candidate["ranking_text"] = (
+            candidate.get("name", "") + "\n" + candidate["text"]
+        )
+
+    if USE_RERANKER:
+        from app.rag.rerank import rerank
+
+        reranked = rerank(
+            query, fused[:35], text_key="ranking_text", top_k=35
+        )
+    else:
+        # Keep the retrieval order without loading the cross-encoder.
+        reranked = fused[:35]
+        for rank, candidate in enumerate(reranked):
+            candidate["_rerank_score"] = 1.0 - rank * 0.001
 
     # 5. Filter + state boost + dedupe
     user_state = (profile.state or "").lower()
@@ -160,9 +180,15 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
             continue
 
         score = r.get("_rerank_score", 0.0)
-        cutoff = MIN_MENTOR_RERANK_SCORE if profile.mode == "mentor" else MIN_RERANK_SCORE
-        if score < cutoff:
-            continue
+
+        if USE_RERANKER:
+            cutoff = (
+                MIN_MENTOR_RERANK_SCORE
+                if profile.mode == "mentor"
+                else MIN_RERANK_SCORE
+            )
+            if score < cutoff:
+                continue
 
         # Boost local schemes
         if profile.mode == "scheme" and user_state and chunk_state == user_state:
