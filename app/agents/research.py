@@ -176,7 +176,8 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
     # Dedupe by document
     chunks = []
     seen_docs = {}
-    max_per_doc = 3 if profile.mode == "scheme" else 2
+    max_per_doc = 3 if profile.mode == "scheme" else 1
+
     for r, adjusted_score in scored:
         doc_id = r.get("doc_id", "")
         if seen_docs.get(doc_id, 0) >= max_per_doc:
@@ -211,12 +212,29 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
     needs_web_fallback = False
     web_query = ""
 
-    if profile.mode == "mentor" and len(chunks) < 3 and profile.career_goal:
-        needs_web_fallback = True
-        web_query = (
-            f"{profile.career_goal} pathway after "
-            f"{profile.education_level or 'school'} India exams salary"
-        )
+
+
+    if profile.mode == "mentor" and profile.career_goal:
+        career = profile.career_goal.strip()
+        education = (profile.education_level or "beginner").strip()
+
+        if any(
+            word in career.lower()
+            for word in (
+                "software",
+                "developer",
+                "programming",
+                "coding",
+                "web development",
+            )
+        ):
+            needs_web_fallback = True
+            web_query = (
+                "beginner web development curriculum Python JavaScript HTML CSS "
+                "hands-on projects official documentation MDN freeCodeCamp"
+            )
+
+
 
     elif profile.mode == "scheme":
         # "Weak" means below a real relevance threshold, not merely below 1.0
@@ -241,11 +259,13 @@ def research(profile: CitizenProfile, top_k: int = 5) -> ResearchResult:
     if needs_web_fallback and web_query:
         try:
             from app.tools.web_search import search as web_search
-            remaining = max(0, top_k - len(chunks))
+            remaining = min(3, top_k) if profile.mode == "mentor" else max(0, top_k - len(chunks))
             web_results = (
                 web_search(web_query, max_results=min(3, remaining))
                 if remaining else []
             )
+            if profile.mode == "mentor" and web_results:
+                chunks = chunks[:max(0, top_k - len(web_results))]
             for i, r in enumerate(web_results):
                 if not r.get("snippet"):
                     continue

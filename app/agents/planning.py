@@ -60,7 +60,117 @@ def _get_client():
     return _client_cache
 
 
+
 def _fallback_plan(profile: CitizenProfile) -> ActionPlan:
+    if profile.mode == "mentor" and profile.career_goal:
+        career_goal = profile.career_goal or "your chosen career"
+        education = profile.education_level or "your current education level"
+
+        return ActionPlan(
+            greeting=(
+                f"Let's build a practical path toward {career_goal}. "
+                f"Based on your background ({education}), this roadmap "
+                "starts with fundamentals and progresses toward projects "
+                "and job preparation. Research sources were unavailable, "
+                "so verify specific courses and credentials before enrolling."
+            ),
+            eligible_schemes=[
+                {
+                    "name": "Programming fundamentals",
+                    "benefits": (
+                        "Learn variables, data types, conditions, loops, "
+                        "functions, and basic problem-solving."
+                    ),
+                    "why_relevant": (
+                        "Builds the foundation needed for software development."
+                    ),
+                },
+                {
+                    "name": "Git and GitHub",
+                    "benefits": (
+                        "Learn version control, repositories, commits, "
+                        "and how to publish projects."
+                    ),
+                    "why_relevant": (
+                        "Helps organize your work and build a visible portfolio."
+                    ),
+                },
+                {
+                    "name": "Web development and databases",
+                    "benefits": (
+                        "Progress through HTML, CSS, JavaScript, a suitable "
+                        "backend, and SQL."
+                    ),
+                    "why_relevant": (
+                        "Provides practical skills for building complete applications."
+                    ),
+                },
+            ],
+            document_checklist=[
+                "A computer and a code editor",
+                "A GitHub account for storing projects",
+                "A consistent daily practice schedule",
+                "A portfolio to document projects and progress",
+            ],
+            timeline=[
+                {
+                    "step": (
+                        "Month 1: Learn Python fundamentals and solve "
+                        "small coding problems. Outcome: complete at least "
+                        "20 beginner exercises."
+                    ),
+                    "time_estimate": "Month 1",
+                },
+                {
+                    "step": (
+                        "Month 2: Practise functions, data structures, "
+                        "debugging, Git, and GitHub. Outcome: publish "
+                        "two small projects."
+                    ),
+                    "time_estimate": "Month 2",
+                },
+                {
+                    "step": (
+                        "Month 3: Learn HTML, CSS, and JavaScript. "
+                        "Outcome: build and publish a responsive website."
+                    ),
+                    "time_estimate": "Month 3",
+                },
+                {
+                    "step": (
+                        "Month 4: Learn backend fundamentals and SQL. "
+                        "Outcome: build an application that stores and "
+                        "retrieves data."
+                    ),
+                    "time_estimate": "Month 4",
+                },
+                {
+                    "step": (
+                        "Month 5: Build a complete project, test it, "
+                        "debug it, and deploy it. Outcome: one documented "
+                        "portfolio-ready project."
+                    ),
+                    "time_estimate": "Month 5",
+                },
+                {
+                    "step": (
+                        "Month 6: Improve your portfolio, practise coding "
+                        "and technical interviews, prepare your resume, "
+                        "and apply to suitable entry-level roles. Outcome: "
+                        "a finished portfolio and a regular application routine."
+                    ),
+                    "time_estimate": "Month 6",
+                },
+            ],
+            next_steps=[
+                "Install Python and VS Code if they are not already installed.",
+                "Create a GitHub account and a repository for your practice.",
+                "Begin with Python fundamentals and build something small every week.",
+                "Treat this as a general roadmap, not a guarantee of job readiness or placement within six months.",
+            ],
+            estimated_annual_benefit=0,
+        )
+
     greetings = {
         "en": (
             "I can help identify relevant options, but more verified "
@@ -92,13 +202,15 @@ def _fallback_plan(profile: CitizenProfile) -> ActionPlan:
     )
 
 
+
 def _build_user_message(
     profile: CitizenProfile,
     research: ResearchResult,
     max_chunks: int,
 ) -> str:
-    """Build a readable evidence prompt with explicit source IDs."""
+    """Build a mode-specific prompt with explicit source IDs."""
     today = datetime.now(ZoneInfo("Asia/Kolkata")).date().isoformat()
+
     user_situation_summary = (
         "User situation summary:\n"
         f"- Education level: {profile.education_level or 'Not provided'}\n"
@@ -129,19 +241,60 @@ def _build_user_message(
         else "No retrieved evidence available."
     )
 
+    if profile.mode == "mentor" and profile.career_goal:
+
+        instructions = (
+            "Create a practical, personalized career development plan "
+            "based on the user's background and career goal. "
+            "Use the existing ActionPlan JSON structure exactly. "
+            "For each requested timeline month, include skills to learn, "
+            "practical work, and a measurable outcome. "
+            "Make next_steps consistent with Month 1; do not recommend a "
+            "different starting course or language. "
+            "Choose one coherent beginner-friendly technology path and avoid "
+            "introducing too many new technologies at once. "
+            "For software development, sequence fundamentals, Git, frontend "
+            "basics, backend and databases, testing, deployment, and job "
+            "preparation realistically. "
+            "In eligible_schemes, recommend only a small number of relevant "
+            "learning resources, courses, projects, or education pathways. "
+            "For each recommendation, write a specific why_relevant explanation "
+            "connected to the user's stated goal. "
+            "Do not use generic government-scheme eligibility language in Mentor "
+            "mode. Explain prerequisites only when known; otherwise use an "
+            "empty eligibility_note. "
+            "Describe the actual learning benefit when supported; do not leave "
+            "benefits empty if the source clearly explains what is taught. "
+            "Use retrieved evidence for factual claims about specific resources, "
+            "providers, credentials, fees, and opportunities. "
+            "Copy the exact Source ID into scheme_id and copy evidence_quote "
+            "verbatim when a recommendation is source-backed. "
+            "For general advice without a matching source, use empty scheme_id, "
+            "evidence_quote, and unavailable source metadata. "
+            "Never invent facts, URLs, credentials, fees, or employment guarantees. "
+            "Return one valid JSON object matching the ActionPlan structure, "
+            "without Markdown fences or commentary."
+        )
+
+    else:
+        instructions = (
+            "Create an action plan using only the supplied evidence. "
+            "For each recommendation, copy its exact Source ID into scheme_id. "
+            "Evidence quotes must be verbatim text from the matching source. "
+            "Do not invent eligibility, benefits, deadlines, or contact details. "
+            "Return one valid JSON object matching the ActionPlan structure. "
+            "Do not include Markdown fences or explanatory text."
+        )
+
     return (
         f"Today in India: {today}\n\n"
         f"{user_situation_summary}\n\n"
         f"Citizen profile:\n{profile.model_dump_json(indent=2)}\n\n"
         f"Language: {profile.language}\n\n"
         f"Retrieved evidence:\n{evidence_text}\n\n"
-        "Create an action plan using only the supplied evidence. "
-        "For each recommendation, copy its exact Source ID into scheme_id. "
-        "Evidence quotes must be verbatim text from the matching source. "
-        "Do not invent eligibility, benefits, deadlines, or contact details. "
-        "Return one valid JSON object matching the ActionPlan structure. "
-        "Do not include Markdown fences or explanatory text."
+        f"{instructions}"
     )
+
 
 
 @traceable(name="sahayak_plan")
@@ -154,7 +307,13 @@ def plan(
     if research is None or not research.chunks:
         return _fallback_plan(profile)
 
-    prompt = _get_prompt()
+    if profile.mode == "mentor" and profile.career_goal:
+        with (ROOT / "app" / "prompts" / "planning" / "mentor.yaml").open(
+            "r", encoding="utf-8"
+        ) as file:
+            prompt = yaml.safe_load(file)
+    else:
+        prompt = _get_prompt()
     client = _get_client()
 
     system_prompt = (
