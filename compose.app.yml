@@ -1,0 +1,27 @@
+# Optional application services layered over the existing PostgreSQL compose file.
+services:
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://sahayak:sahayak@postgres:5432/sahayak
+    command: ["sh", "-c", "python scripts/init_db.py && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+  ui:
+    build: .
+    env_file: .env
+    environment:
+      API_URL: http://api:8000
+      CHROMA_PATH: /app/chroma_db
+    ports: ["127.0.0.1:8501:8501"]
+    volumes:
+      - ./chroma_db:/app/chroma_db
+      - ./data/knowledge_base:/app/data/knowledge_base:ro
+      - ./data/eval:/app/data/eval
+      - sahayak_model_cache:/root/.cache/huggingface
+    depends_on: [api]
+volumes:
+  sahayak_model_cache:

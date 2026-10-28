@@ -4,32 +4,11 @@ from pathlib import Path
 from rank_bm25 import BM25Okapi
 
 
-KB_DIR = Path("data/knowledge_base")
-CATEGORIES = ["central", "kerala", "general", "mentor", "journey"]
+from app.rag.corpus import load_chunks
 
 
 def load_all_chunks() -> list[dict]:
-    """Load every chunk from knowledge_base JSONs."""
-    chunks = []
-    for category in CATEGORIES:
-        folder = KB_DIR / category
-        if not folder.exists():
-            continue
-        for json_file in sorted(folder.glob("*.json")):
-            with open(json_file, "r", encoding="utf-8") as f:
-                doc = json.load(f)
-            meta = doc.get("metadata", {})
-            for i, chunk_text in enumerate(doc["chunks"]):
-                chunks.append({
-                    "id": f"{doc['doc_id']}__chunk_{i}",
-                    "text": chunk_text,
-                    "doc_id": doc["doc_id"],
-                    "name": meta.get("name", doc["doc_id"]),
-                    "category": meta.get("category", "unknown"),
-                    "state": meta.get("state") or "central",
-                    "mode": meta.get("mode", "scheme"),
-                })
-    return chunks
+    return load_chunks()
 
 
 class BM25Index:
@@ -37,15 +16,20 @@ class BM25Index:
 
     def __init__(self):
         self.chunks = load_all_chunks()
-        tokenized = [c["text"].lower().split() for c in self.chunks]
-        self.bm25 = BM25Okapi(tokenized)
+        tokenized = [(c["name"] + " " + c["text"]).lower().split() for c in self.chunks]
+        self.bm25 = BM25Okapi(tokenized) if tokenized else None
 
-    def search(self, query: str, top_k: int = 10) -> list[dict]:
+    def search(self, query: str, top_k: int = 10, mode: str | None = None, state: str | None = None) -> list[dict]:
         """Return top_k chunks ranked by BM25 score."""
+        if self.bm25 is None:
+            return []
         tokens = query.lower().split()
         scores = self.bm25.get_scores(tokens)
         ranked = sorted(
-            zip(self.chunks, scores),
+            ((c, score) for c, score in zip(self.chunks, scores)
+             if (mode is None or c["mode"] == mode)
+             and (not state or c["state"] in (state.lower(), "central"))
+             and score > 0),
             key=lambda x: x[1],
             reverse=True,
         )
@@ -63,7 +47,7 @@ if __name__ == "__main__":
         print(f"\n[{i}] {r['name']} (score: {r['score']:.4f})")
         print(f"    {r['text'][:150]}...")
 
-# Module-level singleton — created once, reused forever
+# Module-level singleton â€” created once, reused forever
 _index_instance = None
 
 

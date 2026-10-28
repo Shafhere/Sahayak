@@ -5,7 +5,9 @@ import bcrypt
 def hash_password(plain: str) -> str:
     """Convert a plain password into a bcrypt hash."""
     # bcrypt requires bytes, and has a 72-byte limit
-    password_bytes = plain.encode("utf-8")[:72]
+    password_bytes = plain.encode("utf-8")
+    if len(password_bytes) > 72:
+        raise ValueError("Password must be at most 72 UTF-8 bytes")
     salt = bcrypt.gensalt(rounds=12)
     hashed = bcrypt.hashpw(password_bytes, salt)
     return hashed.decode("utf-8")

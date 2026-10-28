@@ -1,4 +1,8 @@
 """Cross-encoder reranker for precision."""
+import os
+import torch
+torch.set_num_threads(int(os.getenv("SAHAYAK_CPU_THREADS", "4")))
+
 from sentence_transformers import CrossEncoder
 
 
@@ -11,7 +15,10 @@ def get_model() -> CrossEncoder:
     global _model
     if _model is None:
         print(f"Loading reranker model: {MODEL_NAME}")
-        _model = CrossEncoder(MODEL_NAME)
+        try:
+            _model = CrossEncoder(MODEL_NAME, local_files_only=True)
+        except OSError:
+            _model = CrossEncoder(MODEL_NAME)
     return _model
 
 

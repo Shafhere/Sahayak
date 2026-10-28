@@ -44,12 +44,21 @@ def add_chunks(chunks: list[dict]) -> None:
     )
 
 
-def search(query_embedding: list[float], n_results: int = 5) -> dict:
+def search(query_embedding: list[float], n_results: int = 5, mode: str | None = None, state: str | None = None) -> dict:
     """Search for the most similar chunks to a query embedding."""
     collection = get_or_create_collection()
+    if collection.count() == 0:
+        return {"ids": [[]], "documents": [[]], "metadatas": [[]]}
+    filters = []
+    if mode:
+        filters.append({"mode": mode})
+    if state:
+        filters.append({"state": {"$in": [state.lower(), "central"]}})
+    where = filters[0] if len(filters) == 1 else {"$and": filters} if filters else None
     return collection.query(
+        **({"where": where} if where else {}),
         query_embeddings=[query_embedding],
-        n_results=n_results,
+        n_results=min(n_results, collection.count()),
         include=["documents", "metadatas", "distances"],
     )
 

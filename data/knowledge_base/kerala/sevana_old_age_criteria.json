@@ -1,0 +1,25 @@
+{
+  "doc_id": "sevana_old_age_criteria",
+  "source_file": "data/raw/kerala/sevana_old_age_criteria.html",
+  "metadata": {
+    "name": "Kerala old age pension criteria",
+    "source_url": "https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=2",
+    "publisher": "Government of Kerala, Sevana",
+    "edition": "Portal criteria; verify latest government orders",
+    "retrieved_on": "2026-10-21",
+    "sha256": "a7e29fbdb66082604570364fd3192b760c7488ef9576c0ec94e979b85a9aea3d",
+    "state": "kerala",
+    "active": true,
+    "extraction_version": 2
+  },
+  "chunks": [
+    "Criteria for Allotting Indira Gandhi National Old Age Pension Scheme 1. The annual family income of the applicant should not exceed Rs. 1 lakh 2. Applicant must be a destitute. 3. Applicant should not be a service pensioner / family pensioner.(Ex-gratia family pension/NPS of up to Rs.4000 is excluded.) 4. The applicant should not be under the protection of anyone else 5. The applicant should not be an income tax payer 6. Recipients of any other social welfare pension can not apply except Disabilty Pension.(Maximum of two pension including EPF) 7. The applicant/family should not own more than two acres. ( Scheduled tribe is excluded ) 8. No person shall be eligible if he/she resorts to habitual begging. 9. Applicant should not own/in family non-taxi, four or more wheeled vehicles (except Ambassador car) with engine capacity of more than 1000 cc 10. No person shall be eligible for the pension, if he/she is admitted to a poor home. 11. Applicant should not be a recipient of salary / pension / family pension from Central Government / other State Governments. 12. Age of 60 years or higher. 13. Applicant should not be a retiree from Central / State Public Sector Undertakings and a",
+    "Government / other State Governments. 12. Age of 60 years or higher. 13. Applicant should not be a retiree from Central / State Public Sector Undertakings and a recipient of Pension / Family Pension 14. Residing within the Kerala State for a continuous period of not less than three years. 15. Applicant should not be an applicant /Benificiery of two different local bodies 16. Can apply to the local body of permanent residence 17. Applicant not be the owner / resident of the building more than 2000 Sq Ft"
+  ],
+  "chunk_pages": [
+    0,
+    0
+  ],
+  "num_chunks": 2,
+  "char_count": 1700
+}

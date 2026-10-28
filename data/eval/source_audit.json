@@ -1,0 +1,70 @@
+[
+  {
+    "id": "ncert_career_cards_volume1",
+    "source_url": "https://www.ncert.nic.in/pdf/CareerGuide/Exploring_Career_Cards_Volume1.pdf",
+    "status": "needs_ocr"
+  },
+  {
+    "id": "ncert_counselling",
+    "source_url": "https://www.psscive.ac.in/storage/uploads/others/Guidelines/pdf/english/guidelines-for-careers-in-vocational-education-and-entrepreneurship-development-for-school-counselors-english.pdf",
+    "status": "text_extracted",
+    "chunks": 451
+  },
+  {
+    "id": "nta_neet_2026",
+    "source_url": "https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/202602231394640855.pdf",
+    "status": "text_extracted",
+    "chunks": 225
+  },
+  {
+    "id": "nta_jee_2026",
+    "source_url": "https://cdnbbsr.s3waas.gov.in/s3f8e59f4b2fe7c5705bf878bbd494ccdf/uploads/2025/11/202511021649722475.pdf",
+    "status": "text_extracted",
+    "chunks": 170
+  },
+  {
+    "id": "cbse_compendium_2026",
+    "source_url": "https://cbseacademic.nic.in/web_material/skilledu/Compendium-2026.pdf",
+    "status": "text_extracted",
+    "chunks": 759
+  },
+  {
+    "id": "pmay_urban_2",
+    "source_url": "https://pmay-urban.gov.in/uploads/guidelines/Operational-Guidelines-of-PMAY-U-2.pdf",
+    "status": "text_extracted",
+    "chunks": 228
+  },
+  {
+    "id": "pm_kisan_guidelines",
+    "source_url": "https://www.pmkisan.gov.in/Documents/Revised%20Operational%20Guidelines%20-%20PM-Kisan%20Scheme.pdf",
+    "status": "text_extracted",
+    "chunks": 28
+  },
+  {
+    "id": "pm_yasasvi_guidelines",
+    "source_url": "https://socialjustice.gov.in/public/ckeditor/upload/65661651839791.pdf",
+    "status": "text_extracted",
+    "chunks": 139
+  },
+  {
+    "id": "sevana_widow_criteria",
+    "source_url": "https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=6",
+    "status": "text_extracted",
+    "pages": 1,
+    "chunks": 2
+  },
+  {
+    "id": "sevana_old_age_criteria",
+    "source_url": "https://welfarepension.lsgkerala.gov.in/FAQsEng.aspx?pentypeid=2",
+    "status": "text_extracted",
+    "pages": 1,
+    "chunks": 2
+  },
+  {
+    "id": "kasp_kbf",
+    "source_url": "https://sha.kerala.gov.in/?page_id=110&lang=en",
+    "status": "text_extracted",
+    "pages": 1,
+    "chunks": 4
+  }
+]

@@ -1,5 +1,8 @@
-"""Database engine, session factory, and Base class."""
+
+"""Database engine, session factory, and ORM base for Sahayak."""
+
 import os
+
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -8,23 +11,34 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# The engine talks to PostgreSQL
-engine = create_engine(DATABASE_URL, echo=False, future=True)
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL is not configured. "
+        "Set it in your environment or .env file."
+    )
 
-# Session factory: opens a new DB session when needed,for new DB sessions
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+# Keep SQLAlchemy's connection pool enabled for normal application use.
+engine = create_engine(
+    DATABASE_URL,
+    echo=False,
+    pool_pre_ping=True,
+)
 
-# Base class that all our models inherit from
+# Each request or operation gets its own database session.
+SessionLocal = sessionmaker(
+    bind=engine,
+    autoflush=False,
+    autocommit=False,
+)
+
+# All SQLAlchemy ORM models should inherit from this Base.
 Base = declarative_base()
 
 
 def get_db():
-    """FastAPI dependency — yields a DB session and closes it."""
+    """Yield a database session and always close it afterward."""
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
-
-
-#sql alchamy can know which classes are table

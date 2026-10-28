@@ -39,6 +39,8 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
     if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="User account is inactive")
     token = create_access_token(user.id, user.email, user.role)
     return TokenResponse(
         access_token=token,

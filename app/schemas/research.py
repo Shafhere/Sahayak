@@ -4,6 +4,10 @@ from pydantic import BaseModel
 
 class RetrievedChunk(BaseModel):
     """One retrieved chunk with its source."""
+    chunk_id: str = ""
+    page: int = 0
+    edition: str = ""
+    retrieved_on: str = ""
     doc_id: str
     name: str
     text: str
@@ -14,6 +18,7 @@ class RetrievedChunk(BaseModel):
 
 class ResearchResult(BaseModel):
     """Result of research — retrieved chunks with metadata."""
+    diagnostics: dict = {}
     query: str
     mode: str
     chunks: list[RetrievedChunk] = []

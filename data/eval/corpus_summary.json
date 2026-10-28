@@ -1,0 +1,12 @@
+{
+  "active_documents": 10,
+  "active_chunks": 2016,
+  "chunks_by_mode": {
+    "scheme": 403,
+    "mentor": 1613
+  },
+  "chunks_missing_url": 0,
+  "chunks_with_page": 2008,
+  "excluded_documents": 44,
+  "coverage": "Curated central and Kerala schemes; selected education and career references. Not exhaustive."
+}
