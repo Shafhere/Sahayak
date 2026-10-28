@@ -1,7 +1,7 @@
 """Embed text using sentence-transformers (local, free)."""
 import os
 import torch
-torch.set_num_threads(int(os.getenv("SAHAYAK_CPU_THREADS", "4")))
+torch.set_num_threads(int(os.getenv("SAHAYAK_CPU_THREADS", "1")))
 
 from sentence_transformers import SentenceTransformer
 
